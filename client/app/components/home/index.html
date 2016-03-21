@@ -1,0 +1,10 @@
+<a href="{{user_link}}">{{login_message}}</a>
+<ul>
+  <li ng-repeat="simple in simples">{{simple.name}} ({{simple.id}})</li>
+</ul>
+Name: <input type="text" ng-model="name" />
+<input type="button" ng-click="addSimple(name)" value="Add" ng-disabled="!logged_in" />
+<br />
+{{name}}
+<br />
+<input type="button" ng-click="update()" value="Update" />

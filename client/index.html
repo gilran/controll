@@ -1,0 +1,24 @@
+<html ng-app="bigorApp" dir="rtl" lang="he-IL">
+<head>
+  <script src="assets/js/angular.js"></script>
+  <script src="assets/js/angular-route.js"></script>
+  <script src="app/app.module.js"></script>
+  <script src="app/app.route.js"></script>
+  <script src="app/components/home/controllers.js"></script>
+  <script src="app/shared/api-client.js"></script>
+  <script src="app/shared/data-object.js"></script>
+  <ng-include src="'assets/html/wp-head.html'"></ng-include>
+</head>
+<body>
+  <ng-include src="'assets/html/header.html'"></ng-include>
+  <div id="primary" class="content-area">
+    <div id="content" class="site-content" style="background-color: #292927; color:#ffffff;" role="main">
+      <div class="container">
+        <div ng-view></div>
+      </div>
+    </div>
+  </div>
+  <ng-include src="'assets/html/footer.html'"></ng-include>
+</body>
+</html>
+
