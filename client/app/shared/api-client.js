@@ -1,6 +1,6 @@
 'use strict'
 
-var module = angular.module('ApiClient', []);
+var module = angular.module('bigorApp.ApiClient', []);
 
 module.service('ApiClient', function($http) {
   this.get = function(path, callback) {
@@ -32,6 +32,18 @@ module.service('ApiClient', function($http) {
   this.query = function(data_type, callback) {
     return this.get('/' + data_type + '/query', callback);
   };
+
+  this.insert = function(data_type, data, callback) {
+    return this.post('/' + data_type + '/insert', data, callback);
+  };
+
+  this.update = function(data_type, data, callback) {
+    return this.post('/' + data_type + '/update', data, callback);
+  }
+
+  this.getUser = function(return_address, callback) {
+    return this.get('/user/logged_in?source=' + return_address, callback);
+  }
 });
 
 module.factory('HttpInterceptor', function($q, $log) {

@@ -1,0 +1,41 @@
+.status {
+  position: fixed;
+  font-size: small;
+  top: 0;
+  padding: 3px;
+  width: 40%;
+  left: 30%;
+  text-align: center;
+  color: #000000;
+  font-weight: bold;
+  z-index: 100;
+}
+
+.status a {
+  color: #000000;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.ok {
+  background-color: rgba(0, 255, 0, 0.5);
+}
+
+.error {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+.status-message {
+  padding: 3px;
+}
+
+.english {
+  text-align: left;
+}
+
+.login-info {
+  text-align: left;
+  font-size: small;
+}

@@ -1,6 +1,6 @@
 'use strict'
 
-var module = angular.module('bigorApp.DataObject', ['ApiClient']);
+var module = angular.module('bigorApp.DataObject', ['bigorApp.ApiClient']);
 
 module.service('DataObject', function($q, $log, ApiClient) {
   this.describeAndQuery = function(data_type) {

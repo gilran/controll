@@ -5,6 +5,8 @@ import webapp2
 from google.appengine.api import users
 from webapp2_extras import sessions
 
+import model
+
 class Credentials(object):
   NONE = 0
   USER = 1
@@ -21,6 +23,11 @@ class RestHandler(webapp2.RequestHandler):
     if self._required_credentials > Credentials.NONE:
       user = users.get_current_user()
       if not user:
+        self.abort(httplib.UNAUTHORIZED)
+        return
+
+      user_entity = model.User.query(model.User.email == user.email()).get()
+      if user_entity.credentials_level < self._required_credentials:
         self.abort(httplib.UNAUTHORIZED)
         return
 

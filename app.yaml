@@ -3,13 +3,27 @@ api_version: 1
 threadsafe: true
 
 handlers:
+
 - url: /api/.*
   script: server.main.app
 
-- url: (.*)/
-  static_files: client\1/index.html
-  upload: app
-
-- url: (.*)
+- url: /controll(/app/.*)
   static_files: client\1
   upload: app
+
+- url: /controll(/assets/.*)
+  static_files: client\1
+  upload: app
+
+- url: /controll/(.*)
+  static_files: client/index.html
+  upload: app
+
+- url: (/.*)
+  static_files: \1
+  upload: app
+
+- url: /
+  static_files: client/index.html
+  upload: app
+

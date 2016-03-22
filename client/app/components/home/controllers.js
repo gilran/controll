@@ -3,8 +3,9 @@
 var module = angular.module('bigorApp.Simple', []);
 
 module.controller('SimpleCtrl', function (
-        $scope, $http, $location, $log, ApiClient, DataObject) {
+        $scope, $http, $window, $location, $log, ApiClient, DataObject) {
   $scope.update = function() {
+    $log.log('location: ' + JSON.stringify($location));
     $scope.error = "No error";
     ApiClient.get(
         '/simple/query', 
@@ -34,13 +35,13 @@ module.controller('SimpleCtrl', function (
     DataObject.createTable('simple').then(function(data) {
       $log.log(JSON.stringify(data));
     });
-  }
+  };
 
   $scope.addSimple = function(name) {
     ApiClient.post('/simple/insert', {"name":name}, function(data) {
       $scope.simples.push(data);
     });
-  }
+  };
 
   $scope.update();
 });
