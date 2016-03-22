@@ -9,7 +9,7 @@ module.config(['$routeProvider', function($routeProvider) {
   $routeProvider
       .when('/controll/user/registration', {
         templateUrl:
-            COMPONENTS_HOME + 'user_registration/user_registration.html',
+            COMPONENTS_HOME + 'user/registration/template.html',
       })
       .when('/controll/activity/registration', {
         templateUrl: COMPONENTS_HOME + 'activity/registration/template.html',

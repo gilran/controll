@@ -7,7 +7,7 @@
   <script charset="UTF-8" src="/controll/app/app.module.js"></script>
   <script charset="UTF-8" src="/controll/app/app.route.js"></script>
   <script charset="UTF-8" src="/controll/app/components/home/controllers.js"></script>
-  <script charset="UTF-8" src="/controll/app/components/user_registration/user_registration.js"></script>
+  <script charset="UTF-8" src="/controll/app/components/user/registration/controller.js"></script>
   <script charset="UTF-8" src="/controll/app/components/activity/edit/controller.js"></script>
   <script charset="UTF-8" src="/controll/app/components/activity/list/controller.js"></script>
   <script charset="UTF-8" src="/controll/app/components/activity/registration/controller.js"></script>
@@ -27,7 +27,9 @@
     <div id="content" class="site-content" style="background-color: #292927; color:#ffffff;" role="main">
       <div class="container">
         <div class="col-md-10 login-info">
-          <span>{{logged_in_as}}</span>
+          <span ng-show="logged_in">
+            <span><a href="/controll/user/registration">החשבון שלי</a></span>
+          </span>
           <a href="#" ng-click="goTo(user_link)">{{login_message}}</a>
         </div>
         <div class="col-md-10" ng-view></div>
