@@ -3,11 +3,12 @@ import httplib
 import json
 import logging
 
+from google.appengine.api import users
 from google.appengine.ext import ndb
 
 from rest import RestHandler
 from rest import Credentials
-
+from rest import GetUserCredentialsLevel
 
 class DEFAULT_CREDENTIALS(object):
   def __init__(self):
@@ -19,22 +20,25 @@ class DEFAULT_CREDENTIALS(object):
     self.delete = Credentials.ADMIN
     self.fetch = Credentials.NONE
 
+_PRIVATE_FIELDS = ['email', 'phone_number']
+
 def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
   spec = { k: type(v) for k, v in model._properties.iteritems() }
 
   def ClassBuilder(base):
     class Cls(base):
-      _handlers = []
+      _handlers = {}
 
       @staticmethod
       def _ArgsMatchSpec(args):
         logging.info('Spec: %s', spec.keys())
         logging.info('Args: %s', args.keys())
         if set(spec.keys()) != set(args.keys()):
-          raise Exception('Arguments mismatch.')
+          raise Exception('Arguments mismatch\nExpected: %s\nActual: %s' % (
+            spec.keys(), args.keys()))
 
       @staticmethod
-      def ConvertDateTime(d):
+      def ConvertToNdb(d):
         result = {}
         for name, ndb_type in spec.iteritems():
           if name not in d:
@@ -45,8 +49,31 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
             elif isinstance(d[name], str):
               result[name] = datetime.datetime.strptime(
                   d[name], "%Y-%m-%dT%H:%M:%S.%f")
+          elif ndb_type == ndb.KeyProperty:
+            result[name] = ndb.Key(urlsafe=d[name])
           else:
             result[name] = d[name]
+        return result
+
+      @staticmethod
+      def ConvertFromNdb(d):
+        result = {}
+        user = users.get_current_user()
+        for k, v in d.iteritems():
+          if k in _PRIVATE_FIELDS:
+            if user is None:
+              result[k] = 'private'
+              continue
+            if (GetUserCredentialsLevel() < Credentials.CREW and
+                ('email' not in d or d['email'] != user.email())):
+              result[k] = 'private'
+              continue
+          if isinstance(v, datetime.datetime):
+            result[k] = v.isoformat()
+          elif isinstance(v, ndb.Key):
+            result[k] = Cls.AsDict(ndb.Key(urlsafe=v.urlsafe()).get())
+          else:
+            result[k] = v
         return result
 
       @staticmethod
@@ -55,10 +82,10 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
 
       @staticmethod
       def Update(id, **kwargs):
-        item = Cls.Fetch(id)
+        item = ndb.Key(urlsafe=id).get()
         if not item:
           raise Exception('Trying to update a non-existing entity.')
-        converted_kwargs = Cls.ConvertDateTime(kwargs)
+        converted_kwargs = Cls.ConvertToNdb(kwargs)
         for k, v in converted_kwargs.iteritems():
           setattr(item, k, v)
         item.put()
@@ -67,7 +94,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
       @staticmethod
       def Insert(**kwargs):
         Cls._ArgsMatchSpec(kwargs)
-        converted = Cls.ConvertDateTime(kwargs)
+        converted = Cls.ConvertToNdb(kwargs)
         item = model(**converted)
         item.put()
         logging.info(item)
@@ -87,22 +114,13 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
             id = int(id)
           except:
             return None
-        item = model.get_by_id(id)
-        return item
+        return ndb.Key(urlsafe=id).get()
 
       @staticmethod
       def AsDict(item):
-        logging.info(item)
-        result = {'id': item.key.id()}
-        for k in spec.iterkeys():
-          assert k not in result
-          value = getattr(item, k)
-          if isinstance(value, datetime.datetime):
-            result[k] = value.isoformat()
-          else:
-            result[k] = value
-          logging.info("%s: %s" , k, value)
-        return result
+        item_dict = Cls.ConvertFromNdb(item.to_dict());
+        item_dict['id'] = item.key.urlsafe();
+        return item_dict;
 
       class QueryHandler(RestHandler):
         def __init__(self, request, response):
@@ -179,22 +197,24 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           self._required_credentials = credentials.describe
 
         def get(self):
-          self.SendJson({k: v.__name__ for k, v in spec.iteritems()})
+          result = {}
+          for k, v in model._properties.iteritems():
+            property_description = type(v).__name__
+            logging.info(v._repeated)
+            if v._repeated:
+              property_description += ' (repeated)'
+            elif v._default is not None:
+              property_description += ' (default=%s)' % v._default
+            result[k] = property_description
+          self.SendJson(result)
 
       class ListHandlers(RestHandler):
         def __init__(self, request, response):
-          super(Cls.ListHandler, self).__init__(request, response)
+          super(Cls.ListHandlers, self).__init__(request, response)
           self._required_credentials = credentials.list
 
         def get(self):
-          self.SendJson(
-              [(str(k), str(v)) for k, v in Cls.Handlers()])
-
-      @classmethod
-      def AddHandler(cls, name, handler):
-        logging.info(cls._handlers)
-        cls._handlers.append(
-            ('/api/%s/%s' % (base.__name__.lower(), name), handler))
+          self.SendJson(Cls._handlers.keys())
 
       @classmethod
       def Url(cls, name, **params):
@@ -205,8 +225,12 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
         return url
 
       @classmethod
+      def AddHandler(cls, name, handler):
+        cls._handlers[Cls.Url(name)] = handler
+
+      @classmethod
       def Handlers(cls):
-        return cls._handlers
+        return [(k, v) for k, v in cls._handlers.iteritems()]
 
     Cls.AddHandler('', Cls.ListHandlers)
     Cls.AddHandler('describe', Cls.DescribeHandler)

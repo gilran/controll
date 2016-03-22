@@ -39,3 +39,25 @@
   text-align: left;
   font-size: small;
 }
+
+.console {
+  width: 80vw;
+  position: relative;
+  left: 50%;
+}
+
+.console th {
+  text-align: center;
+  padding: 2px;
+  border-color: lightgray;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.console td {
+  text-align: right;
+  padding: 2px;
+  border-color: lightgray;
+  border-width: 1px;
+  border-style: solid;
+}

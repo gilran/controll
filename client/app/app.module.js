@@ -1,6 +1,10 @@
 'use strict'
 
 var app = angular.module('bigorApp', [
+  'bigorApp.ActivityEdit',
+  'bigorApp.ActivityList',
+  'bigorApp.ActivityService',
+  'bigorApp.ActivityRegistration',
   'bigorApp.ApiClient',
   'bigorApp.DataObject',
   'bigorApp.Route',

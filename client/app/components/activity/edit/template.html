@@ -1,0 +1,85 @@
+<form ng-controller="ActivityEditCtrl" ng-submit="submit()">
+  
+  <p>
+  <label class="form-label">מנחה:</label>
+  <input type="text" ng-model="user.name"/>
+  </p>
+
+  <p>
+  <label class="form-label">שם האירוע:</label>
+  <input type="text" ng-model="activity.name" />
+  </p>
+
+  <p>
+  <label class="form-label">סוג האירוע:</label>
+  <select ng-model="activity.activity_type">
+    <option value="tabletop">משחק תפקידים שולחני</option>
+    <option value="larp">משחק תפקידים חי</option>
+    <option value="miniatures">מיניאטורות</option>
+    <option value="board">קלפים ולוח</option>
+    <option value="lecture">הרצאה</option>
+    <option value="workshop">סדנה</option>
+    <option value="other">אחר</option>
+  </select>
+  </p>
+
+  <p>
+  <label>קדימון:</label><br />
+  <textarea rows="5" cols="69" ng-model="activity.teaser"></textarea>
+  </p>
+
+  <p>
+  <label class="form-label">משך האירוע:</label>
+  <select ng-model="duration">
+    <option value="180" selected="selected">3 שעות</option>
+    <option value="240">4 שעות</option>
+    <option value="300">5 שעות</option>
+    <option value="45">45 דקות (להרצאות וסדנאות)</option>
+    <option value="90">90 דקות</option>
+    <option value="0">אחר (נא לציין תחת הערות)</option>
+  </select>
+  </p>
+
+  <p>
+  <label class="form-label">מינימום משתתפים:</label>
+  <input type="text" ng-model="activity.minimum_participants" />
+  </p>
+  
+  <p>
+  <label class="form-label">מקסימום משתתפים:</label>
+  <input type="text" ng-model="activity.maximum_participants" />
+  </p>
+
+  <p>
+  <label class="form-label">סגנונות:</label>
+  <input type="text" ng-model="tags" /><br />
+  </p>
+
+  <label class="form-label">הגבלת גיל:</label>
+  <select ng-model="age_restriction">
+    <option value="0,120" selected="selected">ללא</option>
+    <option value="0,14">לילדים בלבד</option>
+    <option value="13,20">לבני נוער</option>
+    <option value="13,120">13+</option>
+    <option value="16,120">16+</option>
+    <option value="18,120">18+</option>
+  </select>
+
+  <p><h4>הגבלות זמני שיבוץ (זמנים שבהם אני לא יכול להנחות):</h4></p>
+  <p><label><input type="checkbox" ng-model="unavailable_times[0]" /> בוקר יום ראשון</label></p>
+  <p><label><input type="checkbox" ng-model="unavailable_times[1]" /> צהריים יום ראשון</label></p>
+  <p><label><input type="checkbox" ng-model="unavailable_times[2]" /> ערב יום ראשון</label></p>
+  <p><label><input type="checkbox" ng-model="unavailable_times[3]" /> בוקר יום שני</label></p>
+  <p><label><input type="checkbox" ng-model="unavailable_times[4]" /> צהריים יום שני</label></p>
+  <p><label><input type="checkbox" ng-model="unavailable_times[5]" /> ערב יום שני</label></p>
+  <p>שים לב – אלה הזמנים שבהם לא נשבץ את האירוע שלך.</p>
+
+  <p>
+  <label class="form-label">הערות:</label><br />
+  <textarea rows="5" cols="69" ng-model="activity.notes"></textarea>
+  </p>
+
+  <input type="submit" id="submit" value="אישור" /><br />
+</form>
+
+

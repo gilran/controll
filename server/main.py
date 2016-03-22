@@ -4,15 +4,16 @@ import logging
 import time
 import webapp2
 
+import activity
+import event
 import user
-import simple
 
 config = {}
 config['webapp2_extras.sessions'] = {
     'secret_key': 'my-super-secret-key',
 }
 
-active_models = [user, simple]
+active_models = [activity, event, user]
 handlers = []
 for model in active_models:
   handlers.extend(model.Handlers())

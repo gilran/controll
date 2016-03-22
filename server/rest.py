@@ -13,23 +13,23 @@ class Credentials(object):
   CREW = 2
   ADMIN = 3
 
+def GetUserCredentialsLevel():
+  user = users.get_current_user()
+  if not user:
+    return Credentials.NONE
+  user_entity = model.User.query(model.User.email == user.email()).get()
+  return user_entity.credentials_level
+
 class RestHandler(webapp2.RequestHandler):
   def __init__(self, request, response):
     self.initialize(request, response)
     self._required_credentials = Credentials.NONE
 
   def dispatch(self):
-    logging.info("Required redentials: %s", self._required_credentials)
-    if self._required_credentials > Credentials.NONE:
-      user = users.get_current_user()
-      if not user:
-        self.abort(httplib.UNAUTHORIZED)
-        return
-
-      user_entity = model.User.query(model.User.email == user.email()).get()
-      if user_entity.credentials_level < self._required_credentials:
-        self.abort(httplib.UNAUTHORIZED)
-        return
+    if (self._required_credentials > Credentials.NONE and
+        GetUserCredentialsLevel() < self._required_credentials):
+      self.abort(httplib.UNAUTHORIZED)
+      return
 
     self.session_store = sessions.get_store(request=self.request)
     try:

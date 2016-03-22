@@ -1,0 +1,59 @@
+<div ng-controller='ActivityListCtrl'>
+
+<div class='console'>
+  <table>
+    <thead>
+      <th>#</th>
+      <th>מגיש</th>
+      <th>דוא"ל</th>
+      <th>טלפון</th>
+      <th>שם האירוע</th>
+      <th>סוג</th>
+      <th>טיזר</th>
+      <th>משך</th>
+      <th>סגנונות</th>
+      <th>הגבלת גיל</th>
+      <th>הגבלות שיבוץ</th>
+      <th>הערות</th>
+      <th>עריכה</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="activity in activities">
+        <td>{{$index + 1}}</td>
+        <td>{{activity.submitted_by_user.name}}</td>
+        <td>{{activity.submitted_by_user.email}}</td>
+        <td>{{activity.submitted_by_user.phone_number}}</td>
+        <td>{{activity.name}}</td>
+        <td>{{activity.activity_type}}</td>
+        <td><a href="#" ng-click="showBox(activity.teaser)">הצג</a></td>
+        <td>{{activity.duration | date : H:mm}} דקות</td>
+        <td>{{activity.tags.join(', ')}}</td>
+        <td>{{activity.minimum_age}}-{{activity.maximum_age}}</td>
+        <td>
+          <div ng-repeat="t in activity.unavailable_times">{{t}}</div>
+        </td>
+        <td><a href="#" ng-click="showBox(activity.notes)">הצג</a></td>
+        <td><a href="/controll/activity/edit?id={{activity.id}}">עריכה</a></td>
+      </tr>
+    </tbody>
+  </div>
+  </table>
+</div>
+
+<div class="fancybox-overlay fancybox-overlay-fixed" style="width: auto; height: auto; display: block;" ng-show="show_box">
+  <div class="fancybox-wrap fancybox-desktop fancybox-type-inline fancybox-opened" tabindex="-1" style="width: 530px; height: auto; position: absolute; top: 109px; left: 687px; opacity: 1; overflow: visible;">
+    <div class="fancybox-skin" style="padding: 15px; width: auto; height: auto;">
+      <div class="fancybox-outer">
+        <div class="fancybox-inner" style="overflow: auto; width: 500px; height: auto;">
+          <div style="width: 500px; display: block;">
+            {{box_content}}
+            <p>
+              <button ng-click="hideBox()">סגור</button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+</div>

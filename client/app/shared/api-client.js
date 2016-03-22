@@ -2,7 +2,7 @@
 
 var module = angular.module('bigorApp.ApiClient', []);
 
-module.service('ApiClient', function($http) {
+module.service('ApiClient', function($http, $q) {
   this.get = function(path, callback) {
     var request = {
       method: 'GET',
@@ -39,10 +39,37 @@ module.service('ApiClient', function($http) {
 
   this.update = function(data_type, data, callback) {
     return this.post('/' + data_type + '/update', data, callback);
-  }
+  };
+
+  this.fetch = function(data_type, key, callback) {
+    return this.get('/' + data_type + '/fetch?id=' + key, callback);
+  };
 
   this.getUser = function(return_address, callback) {
     return this.get('/user/logged_in?source=' + return_address, callback);
+  };
+
+  this.doAll = function(promises, callback) {
+    var all_done = $q.defer();
+    var done = 0;
+    var responses = [];
+    
+    var makeDoneFunction = function(index) {
+      return function(response) {
+        responses[index] = response;
+        done++;
+        if (done == promises.length) {
+          all_done.resolve(responses);
+        }
+      };
+    };
+
+    for (var i = 0; i < promises.length; i++) {
+      responses.push(null);
+      promises[i].then(makeDoneFunction(i));
+    }
+
+    return all_done.promise;
   }
 });
 

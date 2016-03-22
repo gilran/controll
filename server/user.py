@@ -5,17 +5,18 @@ from datetime import datetime
 
 from google.appengine.api import users
 
-import data_item_decorator
+from data_item_decorator import DataItem
+from data_item_decorator import DEFAULT_CREDENTIALS
 from rest import RestHandler
 from rest import Credentials
 
 import model
 
-_credentials = data_item_decorator.DEFAULT_CREDENTIALS()
+_credentials = DEFAULT_CREDENTIALS()
 _credentials.query = Credentials.CREW
 _credentials.fetch = Credentials.CREW
 
-@data_item_decorator.DataItem(model.User, _credentials)
+@DataItem(model.User, _credentials)
 class User(object):
 
   @classmethod
