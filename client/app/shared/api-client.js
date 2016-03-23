@@ -5,8 +5,7 @@ var module = angular.module('bigorApp.ApiClient', []);
 module.service(
     'ApiClient', function($http, $q, $httpParamSerializer, $rootScope) {
   this.get = function(path, params, callback) {
-    var url =
-        'http://localhost:8080/api' + path + '?' + $httpParamSerializer(params);
+    var url = '/api' + path + '?' + $httpParamSerializer(params);
     var request = {
       method: 'GET',
       url: url,
@@ -25,7 +24,7 @@ module.service(
   this.post = function(path, data, callback) {
     var request = {
       method: 'POST',
-      url: 'http://localhost:8080/api' + path,
+      url: '/api' + path,
       data: data
     }
     $http(request).then(callback);
