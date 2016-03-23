@@ -6,14 +6,16 @@ var app = angular.module('bigorApp', [
   'bigorApp.ActivityService',
   'bigorApp.ActivityRegistration',
   'bigorApp.ApiClient',
-  'bigorApp.DataObject',
+  'bigorApp.EventAdd',
+  'bigorApp.EventList',
   'bigorApp.Route',
   'bigorApp.Simple',
   'bigorApp.UserRegistration'
 ]);
 
 app.controller(
-    'MainCtrl', function($scope, $window, $location, $timeout, ApiClient) {
+    'MainCtrl',
+    function($scope, $rootScope, $window, $location, $timeout, ApiClient) {
   $scope.clearStatus = function() {
     // TODO(gilran): Condifer ng-show.
     $scope.status = '';
@@ -41,26 +43,33 @@ app.controller(
   $scope.setError = function(message) {
     internalSetStatus('error', message);
   };
+  
+  $scope.setMessage = function(message) {
+    internalSetStatus('message', message);
+  };
+
+  $rootScope.setStatus = $scope.setStatus;
+  $rootScope.setError = $scope.setError;
+  $rootScope.setMessage = $scope.setMessage;
+  $rootScope.clearStatus = $scope.clearStatus;
 
   $scope.goTo = function(url) {
     $window.location.href = url;
   };
     
-  ApiClient.get(
-      '/user/logged_in?source=' + $location.path(),
-      function(response) {
-        if (!!response.data.email) {
-          $scope.logged_in_as = 'מחובר כ-' + response.data.email;
-          $scope.user_link = response.data.url;
-          $scope.login_message = 'יציאה';
-          $scope.logged_in = true;
-        } else {
-          $scope.logged_in_as = '';
-          $scope.user_link = response.data.url;
-          $scope.login_message = 'כניסה למערכת';
-          $scope.logged_in = false;
-        }
-      });
+  ApiClient.getUser($location.path(), function(response) {
+    if (!!response.data.email) {
+      $scope.logged_in_as = 'מחובר כ-' + response.data.email;
+      $scope.user_link = response.data.url;
+      $scope.login_message = 'יציאה';
+      $scope.logged_in = true;
+    } else {
+      $scope.logged_in_as = '';
+      $scope.user_link = response.data.url;
+      $scope.login_message = 'כניסה למערכת';
+      $scope.logged_in = false;
+    }
+  });
 
   $scope.clearStatus();
 });

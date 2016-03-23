@@ -1,7 +1,9 @@
+import calendar
 import datetime
 import httplib
 import json
 import logging
+import pytz
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -20,6 +22,7 @@ class DEFAULT_CREDENTIALS(object):
     self.delete = Credentials.ADMIN
     self.fetch = Credentials.NONE
 
+LOCAL_TIME = pytz.timezone('Asia/Jerusalem')
 _PRIVATE_FIELDS = ['email', 'phone_number']
 
 def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
@@ -28,6 +31,19 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
   def ClassBuilder(base):
     class Cls(base):
       _handlers = {}
+
+      @staticmethod
+      def LocalTime(utc_dt):
+        local_dt = utc_dt.replace(tzinfo=pytz.utc).astimezone(LOCAL_TIME)
+        return LOCAL_TIME.normalize(local_dt)
+
+      @staticmethod
+      def FormatTime(t, format='%H:%M'):
+        return Cls.LocalTime(t).strftime(format)
+
+      @staticmethod
+      def TimeStamp(t):
+        return calendar.timegm(t.timetuple())
 
       @staticmethod
       def _ArgsMatchSpec(args):
@@ -46,17 +62,20 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           if ndb_type == ndb.DateTimeProperty:
             if isinstance(d[name], int):
               result[name] = datetime.datetime.fromtimestamp(d[name] / 1e3)
-            elif isinstance(d[name], str):
+            elif isinstance(d[name], basestring):
               result[name] = datetime.datetime.strptime(
                   d[name], "%Y-%m-%dT%H:%M:%S.%f")
           elif ndb_type == ndb.KeyProperty:
-            result[name] = ndb.Key(urlsafe=d[name])
+            if isinstance(d[name], basestring):
+              result[name] = ndb.Key(urlsafe=d[name])
+            elif isinstance(d[name], list):
+              result[name] = [ndb.Key(urlsafe=k) for k in d[name]]
           else:
             result[name] = d[name]
         return result
 
       @staticmethod
-      def ConvertFromNdb(d):
+      def ConvertFromNdb(d, recursive):
         result = {}
         user = users.get_current_user()
         for k, v in d.iteritems():
@@ -69,9 +88,16 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
               result[k] = 'private'
               continue
           if isinstance(v, datetime.datetime):
-            result[k] = v.isoformat()
+            result[k] = Cls.TimeStamp(v) * 1e3
           elif isinstance(v, ndb.Key):
-            result[k] = Cls.AsDict(ndb.Key(urlsafe=v.urlsafe()).get())
+            if recursive:
+              result[k] = Cls.AsDict(
+                  ndb.Key(urlsafe=v.urlsafe()).get(), recursive)
+            else:
+              result[k] = v.urlsafe()
+          elif isinstance(v, list):
+            result[k] = Cls.ConvertFromNdb(
+                {i: x for i, x in enumerate(v)}, recursive).values()
           else:
             result[k] = v
         return result
@@ -109,16 +135,11 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
       def Fetch(id):
         if id is None:
           return None
-        if isinstance(id, str):
-          try:
-            id = int(id)
-          except:
-            return None
         return ndb.Key(urlsafe=id).get()
 
       @staticmethod
-      def AsDict(item):
-        item_dict = Cls.ConvertFromNdb(item.to_dict());
+      def AsDict(item, recursive=False):
+        item_dict = Cls.ConvertFromNdb(item.to_dict(), recursive);
         item_dict['id'] = item.key.urlsafe();
         return item_dict;
 
@@ -128,7 +149,8 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           self._required_credentials = credentials.query
 
         def get(self):
-          self.SendJson([Cls.AsDict(item) for item in Cls.All()])
+          recursive = self.request.get('r', False)
+          self.SendJson([Cls.AsDict(item, recursive) for item in Cls.All()])
 
       class FetchHandler(RestHandler):
         def __init__(self, request, response):
@@ -138,13 +160,14 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
         def get(self):
           logging.info('FetchHandler: %s', self.request.query_string)
           id = self.request.get('id')
+          recursive = self.request.get('r', False)
           if not id:
             self.abort(httplib.BAD_REQUEST)
           item = Cls.Fetch(id)
           logging.info('Item is %s', item)
           if item is None:
             self.abort(httplib.NOT_FOUND)
-          self.SendJson(Cls.AsDict(item))
+          self.SendJson(Cls.AsDict(item, recursive))
 
       class UpdateHandler(RestHandler):
         def __init__(self, request, response):
@@ -152,7 +175,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           self._required_credentials = credentials.update
 
         def post(self):
-          #try:
+          try:
             args = json.loads(self.request.body)
             if 'id' not in args:
               logging.info('No id: %s', self.request.body)
@@ -160,9 +183,10 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
             id = args['id']
             del args['id']
             item = Cls.Update(id, **args)
-            self.SendJson(Cls.AsDict(item))
-          #except:
-          #  self.abort(httplib.BAD_REQUEST)
+            self.SendJson(Cls.AsDict(item, False))
+          except Exception as e:
+            logging.error('Failed to insert: %s', e)
+            self.abort(httplib.BAD_REQUEST)
 
       class InsertHandler(RestHandler):
         def __init__(self, request, response):
@@ -170,14 +194,14 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           self._required_credentials = credentials.insert
 
         def post(self):
-          #try:
+          try:
             logging.info(self.request.body)
             json_item = json.loads(self.request.body)
             item = Cls.Insert(**json_item)
-            self.SendJson(Cls.AsDict(item))
-          #except Exception as e:
-          #  logging.error('Failed to insert: %s', e)
-          #  self.abort(httplib.BAD_REQUEST)
+            self.SendJson(Cls.AsDict(item, False))
+          except Exception as e:
+            logging.error('Failed to insert: %s', e)
+            self.abort(httplib.BAD_REQUEST)
 
       class DeleteHandler(RestHandler):
         def __init__(self, request, response):

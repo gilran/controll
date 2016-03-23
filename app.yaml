@@ -19,11 +19,11 @@ handlers:
   static_files: client/index.html
   upload: app
 
-- url: (/.*)
-  static_files: \1
+- url: /controll
+  static_files: client/index.html
   upload: app
 
-- url: /
-  static_files: client/index.html
+- url: (/.*)
+  static_files: \1
   upload: app
 

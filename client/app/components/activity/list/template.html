@@ -12,10 +12,12 @@
       <th>טיזר</th>
       <th>משך</th>
       <th>סגנונות</th>
+      <th>מספר משתתפים</th>
       <th>הגבלת גיל</th>
       <th>הגבלות שיבוץ</th>
       <th>הערות</th>
       <th>עריכה</th>
+      <th>הוספת שיבוץ</th>
     </thead>
     <tbody>
       <tr ng-repeat="activity in activities">
@@ -24,16 +26,29 @@
         <td>{{activity.submitted_by_user.email}}</td>
         <td>{{activity.submitted_by_user.phone_number}}</td>
         <td>{{activity.name}}</td>
-        <td>{{activity.activity_type}}</td>
+        <td>{{activity.activity_type | activity_type}}</td>
         <td><a href="#" ng-click="showBox(activity.teaser)">הצג</a></td>
-        <td>{{activity.duration | date : H:mm}} דקות</td>
+        <td>{{activity.duration_minutes | duration}}</td>
         <td>{{activity.tags.join(', ')}}</td>
+        <td>{{activity.minimum_participants}}-{{activity.maximum_participants}}</td>
         <td>{{activity.minimum_age}}-{{activity.maximum_age}}</td>
         <td>
-          <div ng-repeat="t in activity.unavailable_times">{{t}}</div>
+          <div ng-repeat="t in activity.unavailable_times">{{t | unavailable_time}}</div>
         </td>
         <td><a href="#" ng-click="showBox(activity.notes)">הצג</a></td>
         <td><a href="/controll/activity/edit?id={{activity.id}}">עריכה</a></td>
+        <td>
+          <form ng-submit="add_event[$index]()" class="small-form">
+            יום:
+            <select class="small-form" ng-model="event_day[$index]">
+              <option value="24">ראשון</option>
+              <option value="25">שני</option>
+            </select>
+            שעה:
+            <input class="small-form" type="text" ng-model="event_start_time[$index]" />
+            <input type="submit" id="submit" value="הוסף" /><br />
+          </form>
+        </td>
       </tr>
     </tbody>
   </div>

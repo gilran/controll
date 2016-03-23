@@ -40,11 +40,13 @@ module.controller(
 
   ApiClient.doAll([
       ApiClient.getUser($location.path()),
-      ApiClient.fetch('activity', $routeParams['id'])
+      ApiClient.fetch('activity', $routeParams['id'], false /* recursive */)
   ]).then(function(responses) {
     $log.log(responses);
     $scope.user = responses[0].data.user;
     $scope.activity = responses[1].data;
+
+    // TODO(gilran): Code duplication - move to a service.
     if (!$scope.user.email) {
       $window.location.href = $scope.user.url;
       return;

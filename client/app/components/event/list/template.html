@@ -1,0 +1,61 @@
+<div ng-controller='EventListCtrl'>
+
+<div class='console'>
+  <table>
+    <thead>
+      <th>#</th>
+      <th>שם</th>
+      <th>סוג</th>
+      <th>שעת התחלה</th>
+      <th>שעת סיום</th>
+      <th>צוות</th>
+      <th>משתתפים</th>
+      <th>פרטים נוספים</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="event in events">
+        <td>{{$index + 1}}</td>
+        <td><a href="/controll/activity/edit?id={{event.activity.id}}">{{event.activity.name}}</a></td>
+        <td>{{event.activity.activity_type | activity_type}}</td>
+        <td>{{event.start_time | date:'dd/MM HH:mm'}}</td>
+        <td>{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'dd/MM HH:mm'}}</td>
+        <td>
+          <span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span><br />
+        </td>
+        <td>
+          <ul>
+            <li ng-repeat="p in event.participants">
+              {{p.name}}
+              <a href="#" ng-click="cancelRegistration($parent.$index, $index)">בטל</a>
+            </li>
+          </ul>
+        </td>
+        <td>
+          סגנונות: {{event.activity.tags.join(', ')}} <br />
+          מספר משתתפים: {{event.activity.minimum_participants}}-{{event.activity.maximum_participants}} <br />
+          הגבלת גיל: {{[event.activity.minimum_age, event.activity.maximum_age] | age_restriction}} <br />
+        </td>
+      </tr>
+    </tbody>
+  </div>
+  </table>
+</div>
+
+<div class="fancybox-overlay fancybox-overlay-fixed" style="width: auto; height: auto; display: block;" ng-show="show_box">
+  <div class="fancybox-wrap fancybox-desktop fancybox-type-inline fancybox-opened" tabindex="-1" style="width: 530px; height: auto; position: absolute; top: 109px; left: 687px; opacity: 1; overflow: visible;">
+    <div class="fancybox-skin" style="padding: 15px; width: auto; height: auto;">
+      <div class="fancybox-outer">
+        <div class="fancybox-inner" style="overflow: auto; width: 500px; height: auto;">
+          <div style="width: 500px; display: block;">
+            {{box_content}}
+            <p>
+              <button ng-click="hideBox()">סגור</button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+</div>
+

@@ -46,5 +46,15 @@ module.service('ActivityService', function() {
       return x.trim();
     });
   };
+
+  this.ACTIVITY_TYPES = {
+    'tabletop': 'משחק תפקידים שולחני',
+    'larp': 'משחק תפקידים חי',
+    'miniatures': 'מיניאטורות',
+    'board': 'קלפים ולוח',
+    'lecture': 'הרצאה',
+    'workshop': 'סדנה',
+    'other': 'אחר'
+  };
 });
 

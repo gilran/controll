@@ -2,15 +2,21 @@
 
 var module = angular.module('bigorApp.ApiClient', []);
 
-module.service('ApiClient', function($http, $q) {
-  this.get = function(path, callback) {
+module.service(
+    'ApiClient', function($http, $q, $httpParamSerializer, $rootScope) {
+  this.get = function(path, params, callback) {
+    var url =
+        'http://localhost:8080/api' + path + '?' + $httpParamSerializer(params);
     var request = {
       method: 'GET',
-      url: 'http://localhost:8080/api' + path,
+      url: url,
     }
     var promise = $http(request);
     if (!!callback) {
-      promise.then(callback);
+      promise.then(function(response) {
+        callback(response);
+        $rootScope.setStatus('טעינה הסתיימה');
+      });
       return null;
     }
     return promise;
@@ -26,11 +32,11 @@ module.service('ApiClient', function($http, $q) {
   }
 
   this.describe = function(data_type, callback) {
-    return this.get('/' + data_type + '/describe', callback);
+    return this.get('/' + data_type + '/describe', {}, callback);
   };
 
-  this.query = function(data_type, callback) {
-    return this.get('/' + data_type + '/query', callback);
+  this.query = function(data_type, recursive, callback) {
+    return this.get('/' + data_type + '/query', {'r': recursive}, callback);
   };
 
   this.insert = function(data_type, data, callback) {
@@ -41,12 +47,13 @@ module.service('ApiClient', function($http, $q) {
     return this.post('/' + data_type + '/update', data, callback);
   };
 
-  this.fetch = function(data_type, key, callback) {
-    return this.get('/' + data_type + '/fetch?id=' + key, callback);
+  this.fetch = function(data_type, key, recursive, callback) {
+    return this.get(
+        '/' + data_type + '/fetch', {'id': key, 'r': recursive}, callback);
   };
 
   this.getUser = function(return_address, callback) {
-    return this.get('/user/logged_in?source=' + return_address, callback);
+    return this.get('/user/logged_in', {'source': return_address}, callback);
   };
 
   this.doAll = function(promises, callback) {
@@ -73,9 +80,10 @@ module.service('ApiClient', function($http, $q) {
   }
 });
 
-module.factory('HttpInterceptor', function($q, $log) {
+module.factory('HttpInterceptor', function($q, $log, $rootScope) {
   return {
     'request': function(config) {
+      $rootScope.setMessage('טוען...');
       return config;
     },
     'requestError': function(rejection) {
@@ -85,6 +93,8 @@ module.factory('HttpInterceptor', function($q, $log) {
       return response;
     },
     'responseError': function(rejection) {
+      $rootScope.setError(rejection.data.error_message);
+      $log.log(rejection);
       return $q.reject(rejection);
     }
   };

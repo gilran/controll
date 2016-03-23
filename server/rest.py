@@ -13,12 +13,20 @@ class Credentials(object):
   CREW = 2
   ADMIN = 3
 
-def GetUserCredentialsLevel():
+def LookupUserByEmail(email):
+  return model.User.query(model.User.email == email).get()
+
+def CurrentUser():
   user = users.get_current_user()
   if not user:
+    return None
+  return LookupUserByEmail(user.email())
+
+def GetUserCredentialsLevel():
+  user = CurrentUser()
+  if not user:
     return Credentials.NONE
-  user_entity = model.User.query(model.User.email == user.email()).get()
-  return user_entity.credentials_level
+  return user.credentials_level
 
 class RestHandler(webapp2.RequestHandler):
   def __init__(self, request, response):
@@ -45,4 +53,3 @@ class RestHandler(webapp2.RequestHandler):
   def SendJson(self, r):
     self.response.headers['content-type'] = 'text/plain'
     self.response.write(json.dumps(r))
-

@@ -20,9 +20,14 @@ module.config(['$routeProvider', function($routeProvider) {
       .when('/controll/activity/edit', {
         templateUrl: COMPONENTS_HOME + 'activity/edit/template.html',
       })
+      .when('/controll/event/add', {
+        templateUrl: COMPONENTS_HOME + 'event/add/template.html',
+      })
+      .when('/controll/event/list', {
+        templateUrl: COMPONENTS_HOME + 'event/list/template.html',
+      })
       .otherwise({
-        templateUrl: '/controll/app/components/home/index.html',
-        controller: 'SimpleCtrl'
+        templateUrl: COMPONENTS_HOME + 'event/program/template.html',
       });
 }]);
   
