@@ -60,10 +60,6 @@ class User(ndb.Model):
   credentials_level = ndb.IntegerProperty(default=1)
   is_club_member = ndb.BooleanProperty(default=False)
 
-class TimeRange(ndb.Model):
-  start = ndb.DateTimeProperty()
-  end = ndb.DateTimeProperty()
-
 ACTIVITY_TYPES = {
     'tabletop': u'משחק תפקידים שולחני',
     'larp': u'משחק תפקידים חי',

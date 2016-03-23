@@ -20,8 +20,8 @@ def FormatTime(t, format='%H:%M'):
 def TimeStamp(t):
   return calendar.timegm(t.timetuple())
 
-@staticmethod
-def ConvertToNdb(d):
+def ConvertToNdb(model, d):
+  spec = { k: type(v) for k, v in model._properties.iteritems() }
   result = {}
   for name, ndb_type in spec.iteritems():
     if name not in d:

@@ -44,7 +44,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
         item = ndb.Key(urlsafe=id).get()
         if not item:
           raise Exception('Trying to update a non-existing entity.')
-        converted_kwargs = ndb_json.ConvertToNdb(kwargs)
+        converted_kwargs = ndb_json.ConvertToNdb(model, kwargs)
         for k, v in converted_kwargs.iteritems():
           setattr(item, k, v)
         item.put()
@@ -53,7 +53,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
       @staticmethod
       def Insert(**kwargs):
         Cls._ArgsMatchSpec(kwargs)
-        converted = ndb_json.ConvertToNdb(kwargs)
+        converted = ndb_json.ConvertToNdb(model, kwargs)
         item = model(**converted)
         item.put()
         return item

@@ -43,7 +43,7 @@ class InsertHandler(Event.InsertHandler):
   def post(self):
     try:
       json_item = json.loads(self.request.body)
-      converted = ndb_json.ConvertToNdb(json_item)
+      converted = ndb_json.ConvertToNdb(model.Event, json_item)
       activity = converted['activity'].get()
       start_time = converted['start_time']
       user_key = activity.submitted_by_user

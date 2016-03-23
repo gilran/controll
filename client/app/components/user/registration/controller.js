@@ -17,7 +17,7 @@ module.controller(
 
   $scope.submit = function() {
     var request_content = {
-      'id': $scope.user.user.id,
+      'id': $scope.user.id,
       'email': $scope.user.email,
       'name': $scope.name,
       'birth_year': parseInt($scope.birth_year),
