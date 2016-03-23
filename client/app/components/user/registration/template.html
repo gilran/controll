@@ -1,32 +1,52 @@
-<form ng-controller="UserRegistrationCtrl" ng-submit="submit()">
-  
-  <label class="form-label">דואר אלקטרוני:</label>
-  <input type="text" class="english" ng-model="email" disabled /><br />
+<div ng-controller="UserRegistrationCtrl">
+  <h4>המידע שלי</h4>
+  <form ng-submit="submit()">
+    <label class="form-label">דואר אלקטרוני:</label>
+    <input type="text" class="english" ng-model="email" disabled /><br />
 
-  <label class="form-label">שם:</label>
-  <input type="text" ng-model="name" /><br />
+    <label class="form-label">שם:</label>
+    <input type="text" ng-model="name" /><br />
 
-  <label class="form-label">שנת לידה:</label>
-  <select ng-model="birth_year">
-    <option ng-repeat="i in getYearsList()" value="{{i}}">
-      {{i}}
-    </option>
-  </select>
-  <br />
+    <label class="form-label">שנת לידה:</label>
+    <select ng-model="birth_year">
+      <option ng-repeat="i in getYearsList()" value="{{i}}">
+        {{i}}
+      </option>
+    </select>
+    <br />
 
-  <label class="form-label">מספר טלפון:</label>
-  <input type="text" ng-model="phone_number" /><br />
+    <label class="form-label">מספר טלפון:</label>
+    <input type="text" ng-model="phone_number" /><br />
 
-  <label>קצת על עצמי (עד 40 מילים – התיאור יופיע באתר הכנס):</label>
-  <br />
-  <textarea rows="5" cols="69" ng-model="about"></textarea>
-  <br />
-  
-  <label class="form-label">חבר מועדון העמותה:</label>
-  <input type="checkbox" ng-model="is_club_member" /><br />
+    <label>קצת על עצמי (עד 40 מילים – התיאור יופיע באתר הכנס):</label>
+    <br />
+    <textarea rows="5" cols="69" ng-model="about"></textarea>
+    <br />
+    
+    <label class="form-label">חבר מועדון העמותה:</label>
+    <input type="checkbox" ng-model="is_club_member" /><br />
 
-  <label class="form-label">צרו עימי קשר:</label>
-  <input type="checkbox" ng-model="contact_me" /><br />
+    <label class="form-label">צרו עימי קשר:</label>
+    <input type="checkbox" ng-model="contact_me" /><br />
 
-  <input type="submit" id="submit" value="אישור" /><br />
-</form>
+    <input type="submit" id="submit" value="שמירה" /><br />
+  </form>
+
+  <h4>האירועים שלי</h4>
+  <table>
+    <thead>
+      <th>שם האירוע</th>
+      <th>בהנחיית</th>
+      <th>זמן</th>
+      <th>תפקיד</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="event in events">
+        <td>{{event.activity.name}}</td>
+        <td><span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span></td>
+        <td>{{event.start_time | date:'dd/MM, HH:mm'}}-{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'HH:mm'}}</td>
+        <td>{{[event, user] | user_role}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

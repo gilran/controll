@@ -9,21 +9,25 @@ handlers:
 
 - url: /controll(/app/.*)
   static_files: client\1
-  upload: app
+  upload: client/app/(.*)
 
 - url: /controll(/assets/.*)
   static_files: client\1
-  upload: app
+  upload: client/assets/(.*)
 
 - url: /controll/(.*)
   static_files: client/index.html
-  upload: app
+  upload: client/index.html
 
 - url: /controll
   static_files: client/index.html
-  upload: app
+  upload: client/index.html
+
+- url: /
+  static_files: index.html
+  upload: index.html
 
 - url: (/.*)
   static_files: \1
-  upload: app
+  upload: index.html
 

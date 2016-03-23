@@ -13,7 +13,9 @@ from rest import Credentials
 from rest import CurrentUser
 from rest import LookupUserByEmail
 
+import event_utils
 import model
+import ndb_json
 
 _credentials = DEFAULT_CREDENTIALS()
 _credentials.query = Credentials.CREW
@@ -41,7 +43,7 @@ class IsLoggedInHandler(RestHandler):
       response['email'] = user.email()
       user_record = LookupUserByEmail(user.email())
       if user_record:
-        response['user'] = User.AsDict(user_record)
+        response['user'] = ndb_json.AsDict(user_record)
 
     self.SendJson(response)
 
@@ -64,30 +66,39 @@ class UpdateHandler(RestHandler):
     self._required_credentials = _credentials.update
 
   def post(self):
-    try:
-      args = json.loads(self.request.body)
-      if 'id' not in args:
-        logging.info('No id: %s', self.request.body)
-        self.abort(httplib.BAD_REQUEST)
-      id = args['id']
-      del args['id']
-      if 'credentials_level' in args:
-        current_user = CurrentUser()
-        if not current_user:
-          args['credentials_level'] = Credentials.USER
-        elif current_user.credentials_level < args['credentials_level']:
-          self.abort(httplib.UNAUTHORIZED)
-          return
-      item = User.Update(id, **args)
-      self.SendJson(User.AsDict(item, False))
-    except Exception as e:
-      logging.error('Failed to insert: %s', e)
+    args = json.loads(self.request.body)
+    if 'id' not in args:
+      logging.info('No id: %s', self.request.body)
       self.abort(httplib.BAD_REQUEST)
+    id = args['id']
+    del args['id']
+    if 'credentials_level' in args:
+      current_user = CurrentUser()
+      if not current_user:
+        args['credentials_level'] = Credentials.USER
+      elif current_user.credentials_level < args['credentials_level']:
+        self.abort(httplib.UNAUTHORIZED)
+        return
+    item = User.Update(id, **args)
+    self.SendJson(ndb_json.AsDict(item, False))
+
+class EventsListHandler(RestHandler):
+  def __init__(self, request, response):
+    super(EventsListHandler, self).__init__(request, response)
+
+  def get(self):
+    user = CurrentUser()
+    if not user:
+      self.SendJson([])
       return
+
+    user_event = event_utils.UserEvents(user.key)
+    self.SendJson([event_utils.MakeProgramEvent(e) for e in user_event])
 
 User.AddHandler('logged_in', IsLoggedInHandler)
 User.AddHandler('record_login', LoginHandler)
 User.AddHandler('update', UpdateHandler)
+User.AddHandler('events', EventsListHandler)
 
 def Handlers():
   return User.Handlers()

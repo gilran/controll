@@ -7,23 +7,22 @@ import json
 import logging
 import operator
 
-from google.appengine.ext import ndb
-
 from data_item_decorator import DataItem
 from rest import Credentials
 from rest import CurrentUser
 from rest import RestHandler
 
+import event_utils
 import model
+import ndb_json
 
 @DataItem(model.Event)
 class Event(object):
   @staticmethod
-  def CollidesWith(start_time, duration, user):
+  def CollidesWith(start_time, duration, user_key):
     end_time = start_time + datetime.timedelta(minutes=duration)
-    qry = model.Event.query(
-        ndb.OR(model.Event.crew == user, model.Event.participants == user))
-    for event in qry:
+
+    for event in event_utils.UserEvents(user_key):
       activity = event.activity.get()
       event_duration = activity.duration_minutes
       event_start_time = event.start_time
@@ -44,7 +43,7 @@ class InsertHandler(Event.InsertHandler):
   def post(self):
     try:
       json_item = json.loads(self.request.body)
-      converted = Event.ConvertToNdb(json_item)
+      converted = ndb_json.ConvertToNdb(json_item)
       activity = converted['activity'].get()
       start_time = converted['start_time']
       user_key = activity.submitted_by_user
@@ -62,7 +61,7 @@ class InsertHandler(Event.InsertHandler):
       converted['crew'].append(activity.submitted_by_user)
       item = model.Event(**converted)
       item.put()
-      self.SendJson(Event.AsDict(item))
+      self.SendJson(ndb_json.AsDict(item))
     except Exception as e:
       raise
       self.abort(httplib.BAD_REQUEST, u'Invalid request')
@@ -72,16 +71,7 @@ class ProgramHandler(Event.QueryHandler):
     super(ProgramHandler, self).__init__(request, response)
 
   def get(self):
-    all_events = [Event.AsDict(item, False) for item in Event.All()]
-    for event in all_events:
-      event['activity'] = Event.AsDict(Event.Fetch(event['activity']), False)
-      crew_details = []
-      for user in event['crew']:
-        user_record = Event.AsDict(Event.Fetch(user))
-        crew_details.append(
-            {'id': user_record['id'], 'name': user_record['name']})
-      event['crew'] = crew_details
-    self.SendJson(all_events)
+    self.SendJson([event_utils.MakeProgramEvent(e) for e in Event.All()])
 
 class BaseRegistrationHandler(RestHandler):
   def __init__(self, request, response):
