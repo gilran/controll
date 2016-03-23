@@ -1,0 +1,36 @@
+indexes:
+
+- kind: User
+  properties:
+  - name: email
+  - name: name
+  - name: birth_year
+  - name: phone_number
+  - name: contact_me
+  - name: about
+  - name: created
+  - name: last_login
+  - name: credentials_level
+  - name: is_club_member
+
+- kind: Activity
+  properties:
+  - name: name
+  - name: activity_type
+  - name: teaser
+  - name: duration_minutes
+  - name: tags
+  - name: minimum_age
+  - name: maximum_age
+  - name: minimum_participants
+  - name: maximum_participants
+  - name: notes
+  - name: unavailable_times
+  - name: submitted_by_user
+
+- kind: Event
+  properties:
+  - name: start_time
+  - name: activity
+  - name: crew
+  - name: participants
