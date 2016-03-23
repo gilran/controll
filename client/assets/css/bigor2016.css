@@ -1,0 +1,157 @@
+/**
+ * Bigor 2016 specific styles, needed to support tags and actions from bigor-functions.php
+ */
+
+blockquote::before {
+	display: none;
+}
+
+blockquote.action-block {
+	font-style: normal;
+	padding: 0.7em;
+	margin: 0;
+	margin-bottom: .7em;
+	clear: both;
+}
+
+blockquote.action-block.float {
+	width: 13em;
+	float: right;
+	clear: none;
+	margin-left: 1.2em;
+}
+
+blockquote.action-block .action-button-box {
+	width: 11em;
+}
+
+blockquote.action-block.begin .action-button-box {
+	float: right;
+}
+
+blockquote.action-block.end .action-button-box {
+	float: left;
+}
+
+blockquote.action-block.center .action-button-box {
+	float: none;
+	margin: 0 auto;
+}
+
+/** Call to action button **/
+a.button {
+	-webkit-appearance: button;
+	color: #fff;
+	cursor: pointer;
+	font-family: "Noto Sans", sans-serif;
+	font-size: 1em;
+	font-weight: 700;
+	padding: 0.4em 1em;
+	text-transform: uppercase;
+	background: #eea038;
+	background: #ef5a22;
+	text-decoration: none;
+	clear: both;
+	display: block;
+	margin: 0;
+	width: 10em;
+	text-align: center;
+	outline: 0;
+	border: solid transparent 2px;
+}
+
+a.button:active {
+	background-color: #494947;
+	border: solid black 2px;
+}
+
+a.button:hover {
+	text-decoration: none;
+	background-color: #494947;
+	text-shadow: none !important;
+}
+
+form[data-controll-form] button[type=submit], form[data-controll-form] button[data-controll-action]  {
+	-webkit-appearance: button;
+	color: #fff;
+	cursor: pointer;
+	font-family: "Noto Sans", sans-serif;
+	font-size: 1em;
+	font-weight: 700;
+	padding: 0.4em 1em;
+	text-transform: uppercase;
+	background: #eea038;
+	background: #ef5a22;
+	text-decoration: none;
+	clear: both;
+	display: block;
+	margin: 0.2em 0;
+	width: 10em;
+	text-align: center;
+	outline: 0;
+	border: solid transparent 2px;
+}
+form .form-label {
+	width: 10em;
+}
+
+form p {
+	margin-bottom: 1em;
+}
+
+form input[type="text"], form select {
+	width: 26em;
+}
+
+blockquote {
+	background: #3e3e3e;
+	border-left: 4px solid #707070;
+	border-left: 4px solid rgba(51, 51, 51, 0.7);
+/* 	color: #707070; */
+/* 	color: rgba(51, 51, 51, 0.7); */
+	font-size: 18px;
+	font-size: 1.2rem;
+	font-style: italic;
+	line-height: 1.2;
+	margin-bottom: 1.6667em;
+	padding-left: 0.7778em;
+	padding-top: 1em;
+	border: 0;
+	border-right: solid 3px;
+	border-color: #ef5a22 !important;
+}
+
+blockquote {
+	border-right: 0;
+	border-left: solid 3px;
+	padding-right: 0.7778em;
+	padding-left: 0;
+}
+
+blockquote .action-text {
+	clear: both;
+	padding: 0.3em 0 0 0;
+}
+
+blockquote.action-block.float .action-text {
+	text-align: center;
+	font-size: 72%;
+}
+
+.wizard-table td {
+	text-align: center;
+}
+.wizard-table td.active { 
+	background-color: #333333;
+} 
+
+@media screen and (min-width: 500px) {
+	blockquote .action-text {
+		clear: none;
+	}
+}
+@media screen and (min-width: 783px) {
+	blockquote.action-block {
+		margin-left: 6em;
+	}
+}
