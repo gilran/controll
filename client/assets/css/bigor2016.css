@@ -99,7 +99,7 @@ form p {
 	margin-bottom: 1em;
 }
 
-form input[type="text"], form select {
+form input, form select {
 	width: 26em;
 }
 
