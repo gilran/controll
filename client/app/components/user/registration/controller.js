@@ -33,6 +33,15 @@ module.controller(
       $scope.setStatus('User information updated successfully');
     });
   };
+  
+  $scope.cancelRegistration = function(event_index) {
+    var event_id = $scope.events[event_index].id;
+    var data = {'event': event_id};
+    ApiClient.post('/event/unregister', data, function(response) {
+      $scope.setStatus('ההרשמה לאירוע בוטלה');
+      $scope.events.splice(event_index, 1);
+    });
+  };
 
   ApiClient.doAll([
       ApiClient.getUser($location.path()),

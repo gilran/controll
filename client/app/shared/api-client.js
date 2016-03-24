@@ -45,6 +45,10 @@ module.service(
   this.update = function(data_type, data, callback) {
     return this.post('/' + data_type + '/update', data, callback);
   };
+  
+  this.delete = function(data_type, data, callback) {
+    return this.post('/' + data_type + '/update', data, callback);
+  };
 
   this.fetch = function(data_type, key, recursive, callback) {
     return this.get(

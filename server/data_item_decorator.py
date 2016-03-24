@@ -18,6 +18,7 @@ class DEFAULT_CREDENTIALS(object):
     self.update = Credentials.USER
     self.delete = Credentials.ADMIN
     self.fetch = Credentials.NONE
+    self.import_json = Credentials.ADMIN
 
 
 def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
@@ -60,7 +61,9 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
 
       @staticmethod
       def Delete(id):
-        key = ndb.Key(model, id)
+        key = ndb.Key(urlsafe=id)
+        if key.kind() != model.__name__:
+          raise Exception('Trying to delete an entity of the wrong kind.')
         key.delete()
 
       @staticmethod
@@ -68,6 +71,11 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
         if id is None:
           return None
         return ndb.Key(urlsafe=id).get()
+
+      @staticmethod
+      def Import(data):
+        for item in data:
+          Cls.Insert(**item)
 
       class QueryHandler(RestHandler):
         def __init__(self, request, response):
@@ -124,11 +132,17 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           self._required_credentials = credentials.delete
 
         def post(self):
-          try:
-            r = json.loads(self.request.body)
-            Cls.Delete(r['id'])
-          except:
-            self.abort(httplib.BAD_REQUEST)
+          r = json.loads(self.request.body)
+          Cls.Delete(r['id'])
+
+      class ImportJsonHandler(RestHandler):
+        def __init__(self, request, response):
+          super(Cls.ImportHandler, self).__init__(request, response)
+          self._required_credentials = credentials.import_json
+
+        def post(self):
+          data = json.loads(self.request.body)
+          Cls.Import(data)
 
       class DescribeHandler(RestHandler):
         def __init__(self, request, response):
@@ -177,6 +191,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
     Cls.AddHandler('update', Cls.UpdateHandler)
     Cls.AddHandler('delete', Cls.DeleteHandler)
     Cls.AddHandler('fetch', Cls.FetchHandler)
+    Cls.AddHandler('import', Cls.ImportJsonHandler)
 
     return Cls
 

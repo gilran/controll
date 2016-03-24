@@ -6,7 +6,7 @@ var module = angular.module('bigorApp.ActivityRegistration', [
 
 module.controller(
     'ActivityRegistrationCtrl',
-    function($scope, $location, $log, ApiClient, ActivityService) {
+    function($scope, $location, $window, $log, ApiClient, ActivityService) {
   $log.log('ActivityRegistrationCtrl');
   ApiClient.getUser($location.path(), function(response) {
     if (!response.data.email) {

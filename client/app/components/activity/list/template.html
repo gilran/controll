@@ -4,10 +4,10 @@
   <table>
     <thead>
       <th>#</th>
+      <th>שם האירוע</th>
       <th>מגיש</th>
       <th>דוא"ל</th>
       <th>טלפון</th>
-      <th>שם האירוע</th>
       <th>סוג</th>
       <th>טיזר</th>
       <th>משך</th>
@@ -16,16 +16,15 @@
       <th>הגבלת גיל</th>
       <th>הגבלות שיבוץ</th>
       <th>הערות</th>
-      <th>עריכה</th>
       <th>הוספת שיבוץ</th>
     </thead>
     <tbody>
       <tr ng-repeat="activity in activities">
         <td>{{$index + 1}}</td>
+        <td><a href="/controll/activity/edit?id={{activity.id}}">{{activity.name}}</a></td>
         <td>{{activity.submitted_by_user.name}}</td>
         <td>{{activity.submitted_by_user.email}}</td>
         <td>{{activity.submitted_by_user.phone_number}}</td>
-        <td>{{activity.name}}</td>
         <td>{{activity.activity_type | activity_type}}</td>
         <td><a href="#" ng-click="showBox(activity.teaser)">הצג</a></td>
         <td>{{activity.duration_minutes | duration}}</td>
@@ -36,7 +35,6 @@
           <div ng-repeat="t in activity.unavailable_times">{{t | unavailable_time}}</div>
         </td>
         <td><a href="#" ng-click="showBox(activity.notes)">הצג</a></td>
-        <td><a href="/controll/activity/edit?id={{activity.id}}">עריכה</a></td>
         <td>
           <form ng-submit="add_event[$index]()" class="small-form">
             יום:

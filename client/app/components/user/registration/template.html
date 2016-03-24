@@ -39,6 +39,7 @@
       <th>בהנחיית</th>
       <th>זמן</th>
       <th>תפקיד</th>
+      <th>ביטול</th>
     </thead>
     <tbody>
       <tr ng-repeat="event in events">
@@ -46,6 +47,7 @@
         <td><span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span></td>
         <td>{{event.start_time | date:'dd/MM, HH:mm'}}-{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'HH:mm'}}</td>
         <td>{{[event, user] | user_role}}</td>
+        <td><a href="#" ng-click="cancelRegistration($index)">ביטול</a></td>
       </tr>
     </tbody>
   </table>

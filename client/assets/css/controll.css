@@ -72,7 +72,7 @@
   padding: 1px;
 }
 
-.small-form input[type="text"], select {
+.small-form input[type="text"], .small-form input:not([type]), .small-form select {
   width: 100px !important;
 }
 
@@ -96,3 +96,17 @@
   border-bottom-style: solid;
 }
 
+.filters div {
+  display: inline-table;
+  width: 30%;
+}
+
+.filter select {
+  width: auto;
+  display: block;
+  margin-right: 5px !important;
+}
+
+.filter span {
+  display: inline-table;
+}

@@ -51,3 +51,14 @@ module.filter('age_restriction', function() {
       (max == 120 ? min + ' ומטה' : min + '-' + max);
   };
 });
+
+module.filter('people_list', function() {
+  return function(input) {
+    var result = input[0].name;
+    for (var i = 1; i < input.length; i++) {
+      result += (i == input.length - 1 ? ' ו' : ', ');
+      result += input[i].name;
+    }
+    return result;
+  };
+});

@@ -8,13 +8,15 @@ var app = angular.module('bigorApp', [
   'bigorApp.ApiClient',
   'bigorApp.EventAdd',
   'bigorApp.EventList',
+  'bigorApp.EventProgram',
   'bigorApp.Route',
   'bigorApp.UserRegistration'
 ]);
 
 app.controller(
     'MainCtrl',
-    function($scope, $rootScope, $window, $location, $timeout, ApiClient) {
+    function($log, $scope, $rootScope, $window, $location, $timeout,
+             ApiClient) {
   $scope.clearStatus = function() {
     // TODO(gilran): Condifer ng-show.
     $scope.status = '';
@@ -54,6 +56,10 @@ app.controller(
 
   $scope.goTo = function(url) {
     $window.location.href = url;
+  };
+
+  $scope.inProgramPage = function() {
+    return ($location.path() == '/controll/');
   };
     
   ApiClient.getUser($location.path(), function(response) {

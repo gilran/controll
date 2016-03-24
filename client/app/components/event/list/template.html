@@ -11,6 +11,8 @@
       <th>צוות</th>
       <th>משתתפים</th>
       <th>פרטים נוספים</th>
+      <th>פעיל</th>
+      <th>ביטול</th>
     </thead>
     <tbody>
       <tr ng-repeat="event in events">
@@ -20,20 +22,46 @@
         <td>{{event.start_time | date:'dd/MM HH:mm'}}</td>
         <td>{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'dd/MM HH:mm'}}</td>
         <td>
-          <span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span><br />
+          <ul>
+            <li ng-repeat="p in event.crew">
+              {{p.name}}
+              <a href="#" ng-click="removeFromCrew($parent.$index, $index)">הסרה</a><br />
+            </li>
+          </ul>
+          <form class="small-form">
+            <select ng-model="added_crew_member[$index]">
+              <option ng-repeat="user in users" value="{{$index}}">{{user.name}} ({{user.email}})</option>
+            </select>
+            <a href="#" ng-click="addToCrew($index)" >הוספה</a>
+          </form>
         </td>
         <td>
           <ul>
             <li ng-repeat="p in event.participants">
               {{p.name}}
-              <a href="#" ng-click="cancelRegistration($parent.$index, $index)">בטל</a>
+              <a href="#" ng-click="showCancelRegistrationBox($parent.$index, $index)">הסרה</a>
             </li>
           </ul>
+          <form class="small-form">
+            <select ng-model="added_participant[$index]">
+              <option ng-repeat="user in users" value="{{$index}}">{{user.name}} ({{user.email}})</option>
+            </select>
+            <a href="#" ng-click="register($index)" >הוספה</a>
+          </form>
         </td>
         <td>
           סגנונות: {{event.activity.tags.join(', ')}} <br />
           מספר משתתפים: {{event.activity.minimum_participants}}-{{event.activity.maximum_participants}} <br />
           הגבלת גיל: {{[event.activity.minimum_age, event.activity.maximum_age] | age_restriction}} <br />
+        </td>
+        <td>
+          {{event.enabled ? 'כן' : 'לא'}} -
+          <a href="#" ng-click="setEventEnabled(event, !event.enabled)">
+            {{event.enabled ? 'הקפאה' : 'הפעלה'}}
+          </a>
+        </td>
+        <td>
+          <a href="#" ng-click="showCancelEventBox($index)">ביטול</a>
         </td>
       </tr>
     </tbody>
@@ -49,7 +77,9 @@
           <div style="width: 500px; display: block;">
             {{box_content}}
             <p>
-              <button ng-click="hideBox()">סגור</button>
+              <button ng-click="hideBox()" ng-show="show_close_box">סגור</button>
+              <button ng-click="box_action()" ng-show="show_ok">כן</button>
+              <button ng-click="hideBox()" ng-show="show_cancel">לא</button>
             </p>
           </div>
         </div>

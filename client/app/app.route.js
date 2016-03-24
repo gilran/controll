@@ -35,8 +35,11 @@ module.config(['$routeProvider', function($routeProvider) {
       .when('/controll/event/list', {
         templateUrl: makeTemplateUrl('event', 'list')
       })
-      .otherwise({
+      .when('/controll/', {
         templateUrl: makeTemplateUrl('event', 'program')
+      })
+      .otherwise({
+        redirectTo: '/controll/'
       });
 }]);
 

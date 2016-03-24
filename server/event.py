@@ -8,6 +8,7 @@ import logging
 import operator
 
 from data_item_decorator import DataItem
+from data_item_decorator import DEFAULT_CREDENTIALS
 from rest import Credentials
 from rest import CurrentUser
 from rest import RestHandler
@@ -16,7 +17,10 @@ import event_utils
 import model
 import ndb_json
 
-@DataItem(model.Event)
+_credentials = DEFAULT_CREDENTIALS()
+_credentials.delete = Credentials.CREW
+
+@DataItem(model.Event, _credentials)
 class Event(object):
   @staticmethod
   def CollidesWith(start_time, duration, user_key):
@@ -32,8 +36,8 @@ class Event(object):
           (event_start_time <= end_time and end_time <= event_end_time)):
         return u"האירוע מתנגש עם '%s' (%s-%s)" % (
             activity.name,
-            Event.FormatTime(event_start_time),
-            Event.FormatTime(event_end_time))
+            ndb_json.FormatTime(event_start_time),
+            ndb_json.FormatTime(event_end_time))
     return None
 
 class InsertHandler(Event.InsertHandler):
@@ -71,7 +75,9 @@ class ProgramHandler(Event.QueryHandler):
     super(ProgramHandler, self).__init__(request, response)
 
   def get(self):
-    self.SendJson([event_utils.MakeProgramEvent(e) for e in Event.All()])
+    qry = model.Event.query(model.Event.enabled == True)
+    logging.info('ProgramHandler');
+    self.SendJson([event_utils.MakeProgramEvent(e) for e in qry])
 
 class BaseRegistrationHandler(RestHandler):
   def __init__(self, request, response):
@@ -159,8 +165,9 @@ class RegisterHandler(BaseRegistrationHandler):
     self._ValidateUserRegistration()
 
   def Apply(self):
-    self.event.participants.append(self.user.key)
-    self.event.put()
+    if self.user.key not in self.event.participants:
+      self.event.participants.append(self.user.key)
+      self.event.put()
     self.SendJson({
       'user': self.user.key.urlsafe(),
       'event': self.event.key.urlsafe(),
@@ -181,11 +188,48 @@ class CancelRegistrationHandler(BaseRegistrationHandler):
     self.event.put()
     self.SendJson('')
 
+class AddCrewMemberHandler(BaseRegistrationHandler):
+  def __init__(self, request, response):
+    super(AddCrewMemberHandler, self).__init__(request, response)
+    self._required_credentials = Credentials.CREW
+
+  def Validate(self):
+    """Nothing to validate."""
+    collides_with = Event.CollidesWith(
+        self.event.start_time, self.activity.duration_minutes, self.user.key)
+    if collides_with:
+      self.abort(httplib.BAD_REQUEST, collides_with)
+
+  def Apply(self):
+    if self.user.key not in self.event.crew:
+      self.event.crew.append(self.user.key)
+      self.event.put()
+    self.SendJson({
+      'user': self.user.key.urlsafe(),
+      'event': self.event.key.urlsafe(),
+    })
+
+class RemoveCrewMemberHandler(BaseRegistrationHandler):
+  def __init__(self, request, response):
+    super(RemoveCrewMemberHandler, self).__init__(request, response)
+    self._required_credentials = Credentials.CREW
+
+  def Validate(self):
+    """Nothing to validate."""
+    return
+
+  def Apply(self):
+    self.event.crew = filter(
+        functools.partial(operator.ne, self.user.key), self.event.crew)
+    self.event.put()
+    self.SendJson('')
 
 Event.AddHandler('insert', InsertHandler)
 Event.AddHandler('program', ProgramHandler)
 Event.AddHandler('register', RegisterHandler)
 Event.AddHandler('unregister', CancelRegistrationHandler)
+Event.AddHandler('add_crew_member', AddCrewMemberHandler)
+Event.AddHandler('remove_crew_member', RemoveCrewMemberHandler)
 
 def Handlers():
   return Event.Handlers()

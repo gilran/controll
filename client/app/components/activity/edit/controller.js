@@ -14,7 +14,6 @@ module.controller(
     $log.log('submit');
     var age_restriction = $scope.age_restriction.split(',');
     var activity = $scope.activity;
-    delete activity.submitted_by_user;
     delete activity.__proto__;
     activity.duration_minutes = parseInt($scope.duration);
     activity.tags = ActivityService.tagsList($scope.tags); 
@@ -23,8 +22,12 @@ module.controller(
     activity.minimum_participants = parseInt(activity.minimum_participants);
     activity.maximum_participants = parseInt(activity.maximum_participants);
 
-    if (!activity.minimum_age || !activity.maximum_age ||
-        !activity.minimum_participants || !activity.maximum_participants) {
+    if (isNaN(activity.minimum_age) ||
+        isNaN(activity.maximum_age) ||
+        isNaN(activity.minimum_participants) ||
+        isNaN(activity.maximum_participants) ||
+        activity.maximum_age < activity.minimum_age ||
+        activity.maximum_participants < activity.minimum_participants) {
       $scope.setError('Form contains invalid values');
       return;
     }

@@ -11,9 +11,15 @@ module.controller(
   $scope.show_box = false;
   $scope.box_content = '';
 
-  $scope.showBox = function(content) {
-    $log.log('showBox');
+  $scope.showBox = function(content, action) {
     $scope.box_content = content;
+    $scope.show_close_box = action == null;
+    $scope.show_cancel = action != null;
+    $scope.show_ok = action != null;
+    $scope.box_action = function() {
+      action();
+      $scope.hideBox();
+    }
     $scope.show_box = true;
   };
 
@@ -23,9 +29,19 @@ module.controller(
   };
 
   $scope.update = function() {
-    ApiClient.query('event', true /* recursive */, function(response) {
-      $log.log(response.data);
-      $scope.events = response.data;
+    ApiClient.doAll([
+        ApiClient.query('event', true /* recursive */),
+        ApiClient.query('user', false /* recursive */)
+    ]).then(function(responses) {
+      $scope.events = responses[0].data;
+      $scope.users = responses[1].data;
+      var tags_dict = {};
+      for (var i = 0; i < $scope.events.length; i++) {
+        for (var j = 0; j < $scope.events[i].activity.tags.length; j++) {
+          tags_dict[$scope.events[i].activity.tags[j]] = true;
+        }
+      }
+      $scope.tag_filter_options = Object.keys(tags_dict);
     });
   };
 
@@ -42,20 +58,8 @@ module.controller(
     }
     $scope.update();
   });
-
-  $scope.register = function(event_index, user_index) {
-    var event_id = $scope.events[event_index].id;
-    var data = {'event': event_id};
-    if (user_index != null) {
-      var user_id = $scope.events[event_index].participants[user_index].id;
-      data['user'] = user_id;
-    }
-    ApiClient.post('/event/register', data, function(response) {
-      $scope.setStatus('נרשמת לאירוע');
-    });
-  };
-
-  $scope.cancelRegistration = function(event_index, user_index) {
+  
+  var cancelRegistration = function(event_index, user_index) {
     var event_id = $scope.events[event_index].id;
     var data = {'event': event_id};
     if (user_index != null) {
@@ -70,62 +74,76 @@ module.controller(
     });
   };
 
-  $scope.time_fileter_options = [];
-  for (var i = 9.0; i < 23.5; i += 0.5) {
-    $scope.time_fileter_options.push(i * 60);
-  }
-
-  $scope.filters = {
-    'day': '',
-    'start_time': '',
-    'end_time': ''
+  $scope.showCancelRegistrationBox = function(event_index, user_index) {
+    var event = $scope.events[event_index].activity.name;
+    var user = $scope.events[event_index].participants[user_index].name;
+    var message =
+        'האם את/ה בטוח/ה שברצונך לבטל את הרשמה של ' + user + ' לאירוע "' + event
+        + '"?';
+    var action = function() {
+      cancelRegistration(event_index, user_index);
+    };
+    $scope.showBox(message, action);
   };
 
-  $scope.filterEvents = function() {
-    // In Date, month is 0-based.
-    var days = {
-      24: {
-        'start': (new Date(2016, 3, 24, 0, 0, 0, 0)).getTime(),
-        'end': (new Date(2016, 3, 25, 0, 0, 0, 0)).getTime()
-      },
-      25: {
-        'start': (new Date(2016, 3, 25, 0, 0, 0, 0)).getTime(),
-        'end': (new Date(2016, 3, 26, 0, 0, 0, 0)).getTime()
-      }
-    };
-    return function(event) {
-      if ($scope.filters.day) {
-        var requested_day = parseInt($scope.filters.day);
-        if (days[requested_day]['start'] >= event.start_time ||
-            event.start_time >= days[requested_day]['end']) {
-          return false;
-        }
-      }
+  var cancelEvent = function(event_index) {
+    var data = {'id': $scope.events[event_index].id};
+    ApiClient.delete('event', data, function(response) {
+      $scope.setStatus('האירוע בוטל');
+      $scope.events.splice(event_index, 1);
+    });
+  };
 
-      if ($scope.filters.start_time) {
-        var requested_start_time = parseInt($scope.filters.start_time);
-        var start_as_date = new Date(event.start_time);
-        var start_minutes_in_day =
-            start_as_date.getHours() * 60 + start_as_date.getMinutes();
-        if (requested_start_time > start_minutes_in_day) {
-          return false;
-        }
-      }
-
-      $log.log('end_time_filter = ' + $scope.filters.end_time);
-      if ($scope.filters.end_time) {
-        var requested_end_time = parseInt($scope.filters.end_time);
-        var end_as_date = new Date(
-            event.start_time + event.activity.duration_minutes * 60 * 1000);
-        var end_minutes_in_day =
-            end_as_date.getHours() * 60 + end_as_date.getMinutes();
-        $log.log(end_minutes_in_day);
-        if (requested_end_time < end_minutes_in_day) {
-          return false;
-        }
-      }
-      return true;
+  $scope.showCancelEventBox = function(event_index) {
+    var event = $scope.events[event_index].activity.name;
+    var message =
+        'לא ניתן להחזיר אירוע מבוטל. ניתן להקפיא את האירוע במקום. ' +
+        'האם את/ה בטוח/ה שברצונך לבטל את האירוע "' + event + '"?';
+    var action = function() {
+      cancelEvent(event_index);
     };
+    $scope.showBox(message, action);
+  };
+
+  $scope.setEventEnabled = function(event, enabled) {
+    var data = {'id': event.id, 'enabled': enabled};
+    ApiClient.update('event', data, function(response) {
+      $scope.setStatus('האירוע ' + (enabled ? 'הופעל' : 'הוקפא'));
+      event.enabled = enabled;
+    });
+  };
+
+  $scope.removeFromCrew = function(event_index, user_index) {
+    $log.log(event_index);
+    var event_id = $scope.events[event_index].id;
+    var user_id = $scope.events[event_index].crew[user_index].id;
+    var data = {'event': event_id, 'user': user_id};
+    ApiClient.post('/event/remove_crew_member', data, function(response) {
+      $scope.setStatus('חבר/ת הצוות הוסר/ה');
+      $scope.events[event_index].crew.splice(user_index, 1);
+    });
+  };
+  
+  $scope.added_crew_member = [];
+  $scope.addToCrew = function(event_index) {
+    var event_id = $scope.events[event_index].id;
+    var user = $scope.users[$scope.added_crew_member[event_index]];
+    var data = {'event': event_id, 'user': user.id};
+    ApiClient.post('/event/add_crew_member', data, function(response) {
+      $scope.setStatus('חבר/ת הצוות הוספ/ה');
+      $scope.events[event_index].crew.push(user);
+    });
+  };
+  
+  $scope.added_participant = [];
+  $scope.register = function(event_index) {
+    var event_id = $scope.events[event_index].id;
+    var user = $scope.users[$scope.added_participant[event_index]];
+    var data = {'event': event_id, 'user': user.id};
+    ApiClient.post('/event/register', data, function(response) {
+      $scope.setStatus('ההרשמה בוצעה');
+      $scope.events[event_index].participants.push(user);
+    });
   };
 });
 

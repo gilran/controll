@@ -1,36 +1,80 @@
-<div ng-controller='EventListCtrl'>
+<div ng-controller='EventProgramCtrl'>
 
-  <label>יום:</label>
-  <select ng-model="filters.day">
-    <option value="" selected>הכל</option>
-    <option value="24">ראשון</option>
-    <option value="25">שני</option>
-  </select>
-  <label>מתחיל אחרי:</label>
-  <select ng-model="filters.start_time">
-    <option value="" selected>הכל</option>
-    <option ng-repeat="o in time_fileter_options" value={{o}}>{{o | duration}}</option>
-  </select>
-  <label>נגמר לפני:</label>
-  <select ng-model="filters.end_time">
-    <option value="" selected>הכל</option>
-    <option ng-repeat="o in time_fileter_options" value={{o}}>{{o | duration}}</option>
-  </select>
+  <div class="filters">
+    <div class="filter">
+      <label>סוג:</label>
+      <span>
+        <select ng-model="filters.activity_type">
+          <option value="" selected>הכל</option>
+          <option ng-repeat="o in activity_type_fileter_options" value={{o}}>{{o | activity_type}}</option>
+        </select>
+      </span>
+    </div>
+    <div class="filter">
+      <label>סגנון:</label>
+      <span>
+        <select ng-model="filters.tag">
+          <option value="" selected>הכל</option>
+          <option ng-repeat="o in tag_filter_options" value={{o}}>{{o}}</option>
+        </select>
+      </span>
+    </div>
+    <br />
+    <div class="filter">
+      <label>יום:</label>
+      <span>
+        <select ng-model="filters.day">
+          <option value="" selected>הכל</option>
+          <option value="24">ראשון</option>
+          <option value="25">שני</option>
+        </select>
+      </span>
+    </div>
+    <div class="filter">
+      <label>מתחיל אחרי:</label>
+      <span>
+        <select ng-model="filters.start_time">
+          <option value="" selected>הכל</option>
+          <option ng-repeat="o in time_filter_options()" value={{o}}>{{o | duration}}</option>
+        </select>
+      </span>
+    </div>
+    <div class="filter">
+      <label>נגמר לפני:</label>
+      <span>
+        <select ng-model="filters.end_time">
+          <option value="" selected>הכל</option>
+          <option ng-repeat="o in time_filter_options()" value={{o}}>{{o | duration}}</option>
+        </select>
+      </span>
+    </div>
+  </div>
 
   <div ng-repeat="event in events | filter: filterEvents() | orderBy:'start_time'" class="program-entry">
     <div>
-      <h4 class="program-column-right">
-        {{event.activity.name}}
-      </h4>
+      <h4 class="program-column-right">{{event.activity.name}}</h4>
       <button ng-disabled="" class="program-column-left" ng-click="register($index)">הרשמה</button>
     </div>
     <div>
-      <div class="program-column-right">{{event.activity.teaser}}</div>
+      <div class="program-column-right">
+        <div>{{event.activity.teaser}}</div>
+        <div>
+          <span>
+            <label>
+              {{event.activity.activity_type | activity_type}}
+              בהנחיית
+              {{event.crew | people_list}}
+            </label>
+          </span>
+          |
+          <span><label>סגנונות: </label></span>
+          <span>{{event.activity.tags.join(', ')}}</span>
+        </div>
+      </div>
       <div class="program-column-left">
-        <label>בהנחיית:</label>
-        <span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span><br />
         {{event.start_time | date:'dd/MM, HH:mm'}}-{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'HH:mm'}}<br />
         הגבלת גיל: {{[event.activity.minimum_age, event.activity.maximum_age] | age_restriction}}<br />
+        מקומות פנויים: {{event.activity.maximum_participants - event.participants.length}}<br />
       </div>
     </div>
   </div>

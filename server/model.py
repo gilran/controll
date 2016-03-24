@@ -94,4 +94,4 @@ class Event(ndb.Model):
   activity = ndb.KeyProperty(kind='Activity')
   crew = ndb.KeyProperty(kind='User', repeated=True)
   participants = ndb.KeyProperty(kind='User', repeated=True)
-
+  enabled = ndb.BooleanProperty(default=True)
