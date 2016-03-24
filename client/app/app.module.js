@@ -9,7 +9,6 @@ var app = angular.module('bigorApp', [
   'bigorApp.EventAdd',
   'bigorApp.EventList',
   'bigorApp.Route',
-  'bigorApp.Simple',
   'bigorApp.UserRegistration'
 ]);
 
