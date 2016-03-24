@@ -1,6 +1,23 @@
 <div ng-controller='EventListCtrl'>
 
-  <div ng-repeat="event in events | orderBy:'start_time'" class="program-entry">
+  <label>יום:</label>
+  <select ng-model="filters.day">
+    <option value="" selected>הכל</option>
+    <option value="24">ראשון</option>
+    <option value="25">שני</option>
+  </select>
+  <label>מתחיל אחרי:</label>
+  <select ng-model="filters.start_time">
+    <option value="" selected>הכל</option>
+    <option ng-repeat="o in time_fileter_options" value={{o}}>{{o | duration}}</option>
+  </select>
+  <label>נגמר לפני:</label>
+  <select ng-model="filters.end_time">
+    <option value="" selected>הכל</option>
+    <option ng-repeat="o in time_fileter_options" value={{o}}>{{o | duration}}</option>
+  </select>
+
+  <div ng-repeat="event in events | filter: filterEvents() | orderBy:'start_time'" class="program-entry">
     <div>
       <h4 class="program-column-right">
         {{event.activity.name}}
@@ -10,7 +27,8 @@
     <div>
       <div class="program-column-right">{{event.activity.teaser}}</div>
       <div class="program-column-left">
-        <label>בהנחיית:</label> <span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span><br />
+        <label>בהנחיית:</label>
+        <span ng-repeat="p in event.crew">{{p.name}}{{$last ? '' : ', '}}</span><br />
         {{event.start_time | date:'dd/MM, HH:mm'}}-{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'HH:mm'}}<br />
         הגבלת גיל: {{[event.activity.minimum_age, event.activity.maximum_age] | age_restriction}}<br />
       </div>

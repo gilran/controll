@@ -16,7 +16,7 @@ module.service('EventService', function($log, $rootScope, ApiClient) {
       $rootScope.setError("Invalid time");
     }
     var start_time =
-        new Date(2016, 4, day, splitted_time[0], splitted_time[1], 0, 0);
+        new Date(2016, 3, day, splitted_time[0], splitted_time[1], 0, 0);
 
     var event = {
       'activity': activity.id,
