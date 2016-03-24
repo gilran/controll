@@ -99,7 +99,7 @@ form p {
 	margin-bottom: 1em;
 }
 
-form input, form select {
+form input:not([type]), input[type="text"] form select {
 	width: 26em;
 }
 
