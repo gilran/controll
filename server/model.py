@@ -14,14 +14,14 @@ class _Validators(object):
     current_year = datetime.now().year
     diff = current_year - value
     if diff < 0 or diff > 120:
-      raise Exception("Invalid birth year")
+      raise Exception("Invalid birth year: %s" % value)
     return value
 
   @staticmethod
   def Phone(prop, value):
     value = value.strip().replace('-', '')
     if not _Validators.PHONE_PATTERN.match(value):
-      raise Exception("Invalid phone number")
+      raise Exception("Invalid phone number: %s" % value)
     return value
 
   @staticmethod
@@ -35,7 +35,7 @@ class _Validators(object):
   @staticmethod
   def NotEmpty(prop, value):
     if not value:
-      raise Exception("Empty value for property '%s'" % prop.name)
+      raise Exception("Empty value for property '%s'" % prop._name)
     return value
 
   @staticmethod
@@ -44,13 +44,13 @@ class _Validators(object):
       if value < minimum or value > maximum:
         raise Exception(
             "Value for property '%s' not in range [%s, %s]" %
-            (prop.name, minimum, maximum))
+            (prop._name, minimum, maximum))
       return value
 
 
 class User(ndb.Model):
-  email = ndb.StringProperty()
-  name = ndb.StringProperty(validator=_Validators.Name)
+  email = ndb.StringProperty(validator=_Validators.NotEmpty)
+  name = ndb.StringProperty(validator=_Validators.NotEmpty)
   birth_year = ndb.IntegerProperty(validator=_Validators.BirthYear)
   phone_number = ndb.StringProperty(validator=_Validators.Phone)
   contact_me = ndb.BooleanProperty(default=False)
@@ -71,9 +71,9 @@ ACTIVITY_TYPES = {
 }
 
 class Activity(ndb.Model):
-  name = ndb.StringProperty(validator=_Validators.NotEmpty)
+  name = ndb.StringProperty()
   activity_type = ndb.StringProperty(choices=ACTIVITY_TYPES.keys())
-  teaser = ndb.StringProperty(validator=_Validators.NotEmpty)
+  teaser = ndb.TextProperty()
   duration_minutes = ndb.IntegerProperty(
       validator=_Validators.IntegerBetween(30, 600))
   tags = ndb.StringProperty(repeated=True)
@@ -85,7 +85,7 @@ class Activity(ndb.Model):
       validator=_Validators.IntegerBetween(1, 1000))
   maximum_participants = ndb.IntegerProperty(
       validator=_Validators.IntegerBetween(1, 1000))
-  notes = ndb.StringProperty()
+  notes = ndb.TextProperty()
   unavailable_times = ndb.StringProperty(repeated=True)
   submitted_by_user = ndb.KeyProperty(kind='User')
 

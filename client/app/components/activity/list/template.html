@@ -6,8 +6,6 @@
       <th>#</th>
       <th>שם האירוע</th>
       <th>מגיש</th>
-      <th>דוא"ל</th>
-      <th>טלפון</th>
       <th>סוג</th>
       <th>טיזר</th>
       <th>משך</th>
@@ -22,13 +20,15 @@
       <tr ng-repeat="activity in activities">
         <td>{{$index + 1}}</td>
         <td><a href="/controll/activity/edit?id={{activity.id}}">{{activity.name}}</a></td>
-        <td>{{activity.submitted_by_user.name}}</td>
-        <td>{{activity.submitted_by_user.email}}</td>
-        <td>{{activity.submitted_by_user.phone_number}}</td>
+        <td>
+          {{activity.submitted_by_user.name}}<br />
+          {{activity.submitted_by_user.email}}<br />
+          {{activity.submitted_by_user.phone_number}}<br />
+        </td>
         <td>{{activity.activity_type | activity_type}}</td>
         <td><a href="#" ng-click="showBox(activity.teaser)">הצג</a></td>
         <td>{{activity.duration_minutes | duration}}</td>
-        <td>{{activity.tags.join(', ')}}</td>
+        <td><a href="#" ng-click="showBox(activity.tags.join(', '))">הצג</a></td>
         <td>{{activity.minimum_participants}}-{{activity.maximum_participants}}</td>
         <td>{{activity.minimum_age}}-{{activity.maximum_age}}</td>
         <td>
@@ -41,9 +41,10 @@
             <select class="small-form" ng-model="event_day[$index]">
               <option value="24">ראשון</option>
               <option value="25">שני</option>
-            </select>
+            </select><br />
             שעה:
             <input class="small-form" type="text" ng-model="event_start_time[$index]" />
+            <br />
             <input type="submit" id="submit" value="הוסף" /><br />
           </form>
         </td>

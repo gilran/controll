@@ -1,3 +1,4 @@
+import hashlib
 import httplib
 import json
 import logging
@@ -5,6 +6,7 @@ import webapp2
 from datetime import datetime
 
 from google.appengine.api import users
+from google.appengine.ext import ndb
 
 from data_item_decorator import DataItem
 from data_item_decorator import DEFAULT_CREDENTIALS
@@ -25,6 +27,13 @@ _credentials.fetch = Credentials.CREW
 class User(object):
   pass
 
+
+def MakeUserId(email):
+  id_hash = hashlib.sha1()
+  id_hash.update(email)
+  return id_hash.hexdigest()
+
+
 class IsLoggedInHandler(RestHandler):
   def get(self):
     return_url = self.request.get('source', self.request.uri)
@@ -42,8 +51,13 @@ class IsLoggedInHandler(RestHandler):
       response['url'] = users.create_logout_url(return_url)
       response['email'] = user.email()
       user_record = LookupUserByEmail(user.email())
-      if user_record:
-        response['user'] = ndb_json.AsDict(user_record)
+      if not user_record:
+        user_record = model.User(
+            id=MakeUserId(user.email()),
+            email=user.email(),
+            created=datetime.now())
+        user_record.put()
+      response['user'] = ndb_json.AsDict(user_record)
 
     self.SendJson(response)
 
@@ -55,7 +69,10 @@ class LoginHandler(RestHandler):
     user_record = LookupUserByEmail(user.email())
     now = datetime.now()
     if user_record is None:
-      user_record = model.User(email=user.email(), created=now)
+      user_record = model.User(
+          id=MakeUserId(user.email()),
+          email=user.email(),
+          created=now)
     user_record.last_login = now
     user_record.put()
     self.redirect(self.request.get('redirect', '/'))

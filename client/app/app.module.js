@@ -9,6 +9,7 @@ var app = angular.module('bigorApp', [
   'bigorApp.EventAdd',
   'bigorApp.EventList',
   'bigorApp.EventProgram',
+  'bigorApp.Import',
   'bigorApp.Route',
   'bigorApp.UserRegistration'
 ]);
@@ -23,30 +24,31 @@ app.controller(
     $scope.status_class = 'invisible';
   };
 
-  var show_status_for_ms = 5000;
-  var internalSetStatus = function(status_class, message) {
+  var internalSetStatus = function(status_class, message, show_for_ms) {
     // TODO(gilran): Condifer ng-show.
     $scope.status_class = status_class;
     $scope.status = message;
     var last_status_update = Date.now();
-    $timeout(function() {
-      if (Date.now() >= (last_status_update + show_status_for_ms - 100)) {
-        $scope.clearStatus();
-      }
-    },
-    show_status_for_ms);
+    if (show_for_ms) {
+      $timeout(function() {
+        if (Date.now() >= (last_status_update + show_for_ms - 100)) {
+          $scope.clearStatus();
+        }
+      },
+      show_for_ms);
+    }
   };
 
   $scope.setStatus = function(message) {
-    internalSetStatus('ok', message);
+    internalSetStatus('ok', message, 5000);
   };
 
   $scope.setError = function(message) {
-    internalSetStatus('error', message);
+    internalSetStatus('error', message, 10000);
   };
   
   $scope.setMessage = function(message) {
-    internalSetStatus('message', message);
+    internalSetStatus('message', message, 0);
   };
 
   $rootScope.setStatus = $scope.setStatus;

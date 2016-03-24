@@ -1,0 +1,22 @@
+<form ng-controller="ImportCtrl" ng-submit="submit()">
+  <div>
+    <label class="form-label">ישות מידע:</label>
+    <select ng-model="entity_type">
+      <option value="user">משתמש</option>
+      <option value="activity">פעילות</option>
+      <option value="event">אירוע</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label">מידע</label>
+  </div>
+  <div>
+    <textarea ng-model="data" rows="10" cols="99" class="english" dir="ltr"></textarea>
+  </div>
+  <br />
+  <div>
+    <center>
+      <input type="submit" id="submit" value="יבוא" /><br />
+    </center>
+  </div>
+</form>  

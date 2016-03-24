@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import logging
 import pytz
 
 from google.appengine.api import users
@@ -20,7 +21,7 @@ def FormatTime(t, format='%H:%M'):
 def TimeStamp(t):
   return calendar.timegm(t.timetuple())
 
-def ConvertToNdb(model, d):
+def ConvertToNdb(model, d, string_is_id=False):
   spec = { k: type(v) for k, v in model._properties.iteritems() }
   result = {}
   for name, ndb_type in spec.iteritems():
@@ -34,7 +35,10 @@ def ConvertToNdb(model, d):
             d[name], "%Y-%m-%dT%H:%M:%S.%f")
     elif ndb_type == ndb.KeyProperty:
       if isinstance(d[name], basestring):
-        result[name] = ndb.Key(urlsafe=d[name])
+        if string_is_id:
+          result[name] = ndb.Key(model._properties[name]._kind, d[name])
+        else:
+          result[name] = ndb.Key(urlsafe=d[name])
       elif isinstance(d[name], list):
         result[name] = [ndb.Key(urlsafe=k) for k in d[name]]
     else:
@@ -57,8 +61,8 @@ def ConvertFromNdb(d, recursive):
       result[k] = TimeStamp(v) * 1e3
     elif isinstance(v, ndb.Key):
       if recursive:
-        result[k] = AsDict(
-            ndb.Key(urlsafe=v.urlsafe()).get(), recursive)
+        child = v.get()
+        result[k] = AsDict(v.get(), recursive)
       else:
         result[k] = v.urlsafe()
     elif isinstance(v, list):

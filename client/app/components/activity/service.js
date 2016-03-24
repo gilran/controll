@@ -3,16 +3,13 @@ var module = angular.module('bigorApp.ActivityService', []);
 module.service('ActivityService', function() {
   // TODO(gilran): This is for bigor 2016 only.
   this.unavailableTimeName = function(i) {
+    var DAYS = ['sunday', 'monday'];
+    var TIMES_IN_DAY = ['morning', 'noon', 'evening'];
+    
     var name = 'bigor 2016 ';
-    switch (Math.floor(i / 3)) {
-      case 0: name += 'sunday '; break;
-      case 1: name += 'monday '; break;
-    }
-    switch (i % 3) {
-      case 0: name += 'morning'; break;
-      case 1: name += 'noon'; break;
-      case 2: name += 'evening'; break;
-    }
+    name += DAYS[Math.floor(i / 3)];
+    name += ' ';
+    name += TIMES_IN_DAY[i % 3];
     return name;
   };
 
@@ -27,6 +24,7 @@ module.service('ActivityService', function() {
   };
 
   this.unavailableTimeIndex = function(name) {
+    // TODO(gilran): Switch to using indexOf.
     var name_parts = name.split(' ');
     var index = 0;
     switch (name_parts[2]) {

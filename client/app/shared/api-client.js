@@ -93,6 +93,7 @@ module.factory('HttpInterceptor', function($q, $log, $rootScope) {
       return $q.reject(rejection);
     },
     'response': function(response) {
+      $rootScope.setStatus('הטעינה הושלמה');
       return response;
     },
     'responseError': function(rejection) {

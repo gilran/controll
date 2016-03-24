@@ -35,6 +35,9 @@ module.config(['$routeProvider', function($routeProvider) {
       .when('/controll/event/list', {
         templateUrl: makeTemplateUrl('event', 'list')
       })
+      .when('/controll/import', {
+        templateUrl: COMPONENTS_HOME + 'import/template.html'
+      })
       .when('/controll/', {
         templateUrl: makeTemplateUrl('event', 'program')
       })

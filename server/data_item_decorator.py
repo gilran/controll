@@ -74,8 +74,27 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
 
       @staticmethod
       def Import(data):
-        for item in data:
-          Cls.Insert(**item)
+        for item_as_dict in data:
+          has_id = 'id' in item_as_dict
+          has_key = 'key' in item_as_dict
+          if has_id and has_key:
+            raise Exception('Has both id and key')
+        for item_as_dict in data:
+          item = None
+          item_key = None
+          if 'key' in item_as_dict:
+            item_key = ndb.Key(urlsafe=item_as_dict['key'])
+            item = model(key=item_key)
+            del item_as_dict['key']
+          elif 'id' in item_as_dict:
+            item = model(id=item_as_dict['id'])
+            del item_as_dict['id']
+          else:
+            item = model()
+          converted_item = ndb_json.ConvertToNdb(model, item_as_dict, True)
+          for k, v in converted_item.iteritems():
+            setattr(item, k, v)
+          item.put()
 
       class QueryHandler(RestHandler):
         def __init__(self, request, response):
@@ -137,7 +156,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
 
       class ImportJsonHandler(RestHandler):
         def __init__(self, request, response):
-          super(Cls.ImportHandler, self).__init__(request, response)
+          super(Cls.ImportJsonHandler, self).__init__(request, response)
           self._required_credentials = credentials.import_json
 
         def post(self):
