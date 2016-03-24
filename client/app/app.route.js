@@ -4,31 +4,40 @@ var module = angular.module(
     'bigorApp.Route', ['ngRoute'], function($locationProvider) {
       $locationProvider.html5Mode(true);
     });
-var COMPONENTS_HOME = '/controll/app/components/';
+
 module.config(['$routeProvider', function($routeProvider) {
+  var COMPONENTS_HOME = '/controll/app/components/';
+  var MINIFIED = false;
+  var makeTemplateUrl = function(component, action) {
+    var result =
+        COMPONENTS_HOME +
+        component + '/' + action + '/' +
+        'template' + (MINIFIED ? '.mini' : '') + '.html';
+    return result;
+  };
+
   $routeProvider
       .when('/controll/user/registration', {
-        templateUrl:
-            COMPONENTS_HOME + 'user/registration/template.html',
+        templateUrl: makeTemplateUrl('user', 'registration')
       })
       .when('/controll/activity/registration', {
-        templateUrl: COMPONENTS_HOME + 'activity/registration/template.html',
+        templateUrl: makeTemplateUrl('activity', 'registration')
       })
       .when('/controll/activity/list', {
-        templateUrl: COMPONENTS_HOME + 'activity/list/template.html',
+        templateUrl: makeTemplateUrl('activity', 'list')
       })
       .when('/controll/activity/edit', {
-        templateUrl: COMPONENTS_HOME + 'activity/edit/template.html',
+        templateUrl: makeTemplateUrl('activity', 'edit')
       })
       .when('/controll/event/add', {
-        templateUrl: COMPONENTS_HOME + 'event/add/template.html',
+        templateUrl: makeTemplateUrl('event', 'add')
       })
       .when('/controll/event/list', {
-        templateUrl: COMPONENTS_HOME + 'event/list/template.html',
+        templateUrl: makeTemplateUrl('event', 'list')
       })
       .otherwise({
-        templateUrl: COMPONENTS_HOME + 'event/program/template.html',
+        templateUrl: makeTemplateUrl('event', 'program')
       });
 }]);
-  
+
 
