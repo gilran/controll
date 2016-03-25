@@ -420,7 +420,8 @@ Page header
 
 #content {
 	padding: 1rem 0 3rem;
-	background-color: #fff;
+  background-color: #292927;
+  color:#ffffff;
 	font-size: 0.813rem;
 }
 #bottom-wrapper {
