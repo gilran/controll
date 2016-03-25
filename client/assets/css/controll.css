@@ -119,13 +119,13 @@
   text-align: center;
 }
 
-.contoll-fancybox-l1 {
+.controll-fancybox-l1 {
   width: auto;
   height: auto;
   display: block;
 }
 
-.contoll-fancybox-l2 {
+.controll-fancybox-l2 {
   width: 530px;
   height: auto;
   position: absolute;
@@ -135,19 +135,19 @@
   overflow: visible;
 }
 
-.contoll-fancybox-l3 {
-  padding: 15px;
+.controll-fancybox-l3 {
+  padding: 15px !important;
   width: auto;
   height: auto;
 }
 
-.contoll-fancybox-l5 {
+.controll-fancybox-l5 {
   overflow: auto;
   width: 500px;
   height: auto;
 }
 
-.contoll-fancybox-l6 {
+.controll-fancybox-l6 {
   width: 500px;
   display: block;
 }
