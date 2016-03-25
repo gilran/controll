@@ -1,3 +1,4 @@
 *.pyc
 *.min.html
 *.min.js
+build/closure_compiler.jar
