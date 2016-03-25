@@ -19,7 +19,7 @@ module.service('EventService', function($log, $rootScope, ApiClient) {
         new Date(2016, 3, day, splitted_time[0], splitted_time[1], 0, 0);
 
     var event = {
-      'activity': activity.id,
+      'activity': activity.key,
       'start_time': start_time.getTime(),
       'crew': [],
       'participants': []

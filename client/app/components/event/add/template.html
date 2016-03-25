@@ -5,8 +5,8 @@
   <select ng-model="selected_activity">
     <option
         ng-repeat="activity in activities"
-        value="{{activity.id}}"
-        ng-selected="selected_activity == activity.id">
+        value="{{activity.key}}"
+        ng-selected="selected_activity == activity.key">
       {{activity.name}} ({{activity.submitted_by_user.name}})
     </option>
   </select>

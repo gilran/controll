@@ -18,7 +18,7 @@ def MakeProgramEvent(event):
   for user in event.crew:
     user_record = ndb_json.AsDict(user.get(), False)
     event_dict['crew'].append(
-        {'id': user_record['id'], 'name': user_record['name']})
+        {'key': user_record['key'], 'name': user_record['name']})
   return event_dict
 
 def UserEvents(user_key):

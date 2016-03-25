@@ -26,7 +26,7 @@ module.controller(
       return;
     }
     if ($scope.user.credentials_level < 2 &&
-        $scope.user.id != $scope.activity.submitted_by_user.id) {
+        $scope.user.key != $scope.activity.submitted_by_user.key) {
       $scope.setError('Unauthorized');
       $location.path('/controll');
     }

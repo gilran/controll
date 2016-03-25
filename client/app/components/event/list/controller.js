@@ -60,11 +60,11 @@ module.controller(
   });
   
   var cancelRegistration = function(event_index, user_index) {
-    var event_id = $scope.events[event_index].id;
-    var data = {'event': event_id};
+    var event_key = $scope.events[event_index].key;
+    var data = {'event': event_key};
     if (user_index != null) {
-      var user_id = $scope.events[event_index].participants[user_index].id;
-      data['user'] = user_id;
+      var user_key = $scope.events[event_index].participants[user_index].key;
+      data['user'] = user_key;
     }
     ApiClient.post('/event/unregister', data, function(response) {
       $scope.setStatus('ההרשמה לאירוע בוטלה');
@@ -87,7 +87,7 @@ module.controller(
   };
 
   var cancelEvent = function(event_index) {
-    var data = {'id': $scope.events[event_index].id};
+    var data = {'key': $scope.events[event_index].key};
     ApiClient.delete('event', data, function(response) {
       $scope.setStatus('האירוע בוטל');
       $scope.events.splice(event_index, 1);
@@ -106,7 +106,7 @@ module.controller(
   };
 
   $scope.setEventEnabled = function(event, enabled) {
-    var data = {'id': event.id, 'enabled': enabled};
+    var data = {'key': event.key, 'enabled': enabled};
     ApiClient.update('event', data, function(response) {
       $scope.setStatus('האירוע ' + (enabled ? 'הופעל' : 'הוקפא'));
       event.enabled = enabled;
@@ -115,9 +115,9 @@ module.controller(
 
   $scope.removeFromCrew = function(event_index, user_index) {
     $log.log(event_index);
-    var event_id = $scope.events[event_index].id;
-    var user_id = $scope.events[event_index].crew[user_index].id;
-    var data = {'event': event_id, 'user': user_id};
+    var event_key = $scope.events[event_index].key;
+    var user_key = $scope.events[event_index].crew[user_index].key;
+    var data = {'event': event_key, 'user': user_key};
     ApiClient.post('/event/remove_crew_member', data, function(response) {
       $scope.setStatus('חבר/ת הצוות הוסר/ה');
       $scope.events[event_index].crew.splice(user_index, 1);
@@ -126,9 +126,9 @@ module.controller(
   
   $scope.added_crew_member = [];
   $scope.addToCrew = function(event_index) {
-    var event_id = $scope.events[event_index].id;
+    var event_key = $scope.events[event_index].key;
     var user = $scope.users[$scope.added_crew_member[event_index]];
-    var data = {'event': event_id, 'user': user.id};
+    var data = {'event': event_key, 'user': user.key};
     ApiClient.post('/event/add_crew_member', data, function(response) {
       $scope.setStatus('חבר/ת הצוות הוספ/ה');
       $scope.events[event_index].crew.push(user);
@@ -137,9 +137,9 @@ module.controller(
   
   $scope.added_participant = [];
   $scope.register = function(event_index) {
-    var event_id = $scope.events[event_index].id;
+    var event_key = $scope.events[event_index].key;
     var user = $scope.users[$scope.added_participant[event_index]];
-    var data = {'event': event_id, 'user': user.id};
+    var data = {'event': event_key, 'user': user.key};
     ApiClient.post('/event/register', data, function(response) {
       $scope.setStatus('ההרשמה בוצעה');
       $scope.events[event_index].participants.push(user);

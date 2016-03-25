@@ -84,11 +84,11 @@ class UpdateHandler(RestHandler):
 
   def post(self):
     args = json.loads(self.request.body)
-    if 'id' not in args:
-      logging.info('No id: %s', self.request.body)
+    if 'key' not in args:
+      logging.info('No key: %s', self.request.body)
       self.abort(httplib.BAD_REQUEST)
-    id = args['id']
-    del args['id']
+    key = args['key']
+    del args['key']
     if 'credentials_level' in args:
       current_user = CurrentUser()
       if not current_user:
@@ -96,7 +96,7 @@ class UpdateHandler(RestHandler):
       elif current_user.credentials_level < args['credentials_level']:
         self.abort(httplib.UNAUTHORIZED)
         return
-    item = User.Update(id, **args)
+    item = User.Update(key, **args)
     self.SendJson(ndb_json.AsDict(item, False))
 
 class EventsListHandler(RestHandler):

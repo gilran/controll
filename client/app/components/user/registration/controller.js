@@ -17,7 +17,7 @@ module.controller(
 
   $scope.submit = function() {
     var request_content = {
-      'id': $scope.user.id,
+      'key': $scope.user.key,
       'email': $scope.user.email,
       'name': $scope.name,
       'birth_year': parseInt($scope.birth_year),
@@ -35,8 +35,8 @@ module.controller(
   };
   
   $scope.cancelRegistration = function(event_index) {
-    var event_id = $scope.events[event_index].id;
-    var data = {'event': event_id};
+    var event_key = $scope.events[event_index].key;
+    var data = {'event': event_key};
     ApiClient.post('/event/unregister', data, function(response) {
       $scope.setStatus('ההרשמה לאירוע בוטלה');
       $scope.events.splice(event_index, 1);
@@ -79,16 +79,16 @@ module.filter('user_role', function() {
     var event = event_and_user[0];
     var user = event_and_user[1];
     // TODO(gilran): Proper participants and crew members names.
-    if (event.participants.indexOf(user.id) != -1) {
+    if (event.participants.indexOf(user.key) != -1) {
       return 'שחקן/ית';
     }
     for (var i = 0; i < event.crew.length; i++) {
-      if (event.crew[i].id == user.id) {
+      if (event.crew[i].key == user.key) {
         return 'מנחה';
       }
     }
     throw 'Got an event that the user is not in:' +
-        '\nuser.id = ' + user.id +
+        '\nuser.key = ' + user.key +
         '\nparticipants = ' + JSON.stringify(event.participants) +
         '\ncrew = ' + JSON.stringify(event.crew);
   };

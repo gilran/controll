@@ -41,8 +41,8 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
         return model.query()
 
       @staticmethod
-      def Update(id, **kwargs):
-        item = ndb.Key(urlsafe=id).get()
+      def Update(key, **kwargs):
+        item = ndb.Key(urlsafe=key).get()
         if not item:
           raise Exception('Trying to update a non-existing entity.')
         converted_kwargs = ndb_json.ConvertToNdb(model, kwargs)
@@ -60,17 +60,17 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
         return item
 
       @staticmethod
-      def Delete(id):
-        key = ndb.Key(urlsafe=id)
+      def Delete(key):
+        key = ndb.Key(urlsafe=key)
         if key.kind() != model.__name__:
           raise Exception('Trying to delete an entity of the wrong kind.')
         key.delete()
 
       @staticmethod
-      def Fetch(id):
-        if id is None:
+      def Fetch(key):
+        if key is None:
           return None
-        return ndb.Key(urlsafe=id).get()
+        return ndb.Key(urlsafe=key).get()
 
       @staticmethod
       def Import(data):
@@ -112,11 +112,11 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
           self._required_credentials = credentials.fetch
 
         def get(self):
-          id = self.request.get('id')
+          key = self.request.get('key')
           recursive = self.request.get('r', False)
-          if not id:
+          if not key:
             self.abort(httplib.BAD_REQUEST)
-          item = Cls.Fetch(id)
+          item = Cls.Fetch(key)
           if item is None:
             self.abort(httplib.NOT_FOUND)
           self.SendJson(ndb_json.AsDict(item, recursive))
@@ -128,11 +128,11 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
 
         def post(self):
           args = json.loads(self.request.body)
-          if 'id' not in args:
+          if 'key' not in args:
             self.abort(httplib.BAD_REQUEST)
-          id = args['id']
-          del args['id']
-          item = Cls.Update(id, **args)
+          key = args['key']
+          del args['key']
+          item = Cls.Update(key, **args)
           self.SendJson(ndb_json.AsDict(item, False))
 
       class InsertHandler(RestHandler):
@@ -152,7 +152,7 @@ def DataItem(model, credentials=DEFAULT_CREDENTIALS()):
 
         def post(self):
           r = json.loads(self.request.body)
-          Cls.Delete(r['id'])
+          Cls.Delete(r['key'])
 
       class ImportJsonHandler(RestHandler):
         def __init__(self, request, response):

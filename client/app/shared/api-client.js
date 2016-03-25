@@ -52,7 +52,7 @@ module.service(
 
   this.fetch = function(data_type, key, recursive, callback) {
     return this.get(
-        '/' + data_type + '/fetch', {'id': key, 'r': recursive}, callback);
+        '/' + data_type + '/fetch', {'key': key, 'r': recursive}, callback);
   };
 
   this.getUser = function(return_address, callback) {

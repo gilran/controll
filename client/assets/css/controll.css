@@ -110,3 +110,7 @@
 .filter span {
   display: inline-table;
 }
+
+.teaser {
+  white-space: pre-wrap;
+}

@@ -57,7 +57,8 @@
     </div>
     <div>
       <div class="program-column-right">
-        <div>{{event.activity.teaser}}</div>
+        <!-- This must NOT have spaces around it, because it behaves like a pre -->
+        <div class="teaser">{{event.activity.teaser}}</div>
         <div>
           <span>
             <label>

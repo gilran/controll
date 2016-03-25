@@ -43,7 +43,7 @@ module.controller(
 
   ApiClient.doAll([
       ApiClient.getUser($location.path()),
-      ApiClient.fetch('activity', $routeParams['id'], false /* recursive */)
+      ApiClient.fetch('activity', $routeParams['key'], false /* recursive */)
   ]).then(function(responses) {
     $log.log(responses);
     $scope.user = responses[0].data.user;
@@ -55,7 +55,7 @@ module.controller(
       return;
     }
     if ($scope.user.credentials_level < 2 &&
-        $scope.user.id != $scope.activity.submitted_by_user.id) {
+        $scope.user.key != $scope.activity.submitted_by_user.key) {
       $scope.setError('Unauthorized');
       $location.path('/controll');
     }

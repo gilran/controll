@@ -74,5 +74,5 @@ def ConvertFromNdb(d, recursive):
 
 def AsDict(item, recursive=False):
   item_dict = ConvertFromNdb(item.to_dict(), recursive);
-  item_dict['id'] = item.key.urlsafe();
+  item_dict['key'] = item.key.urlsafe();
   return item_dict;

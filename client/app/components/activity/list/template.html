@@ -19,7 +19,7 @@
     <tbody>
       <tr ng-repeat="activity in activities">
         <td>{{$index + 1}}</td>
-        <td><a href="/controll/activity/edit?id={{activity.id}}">{{activity.name}}</a></td>
+        <td><a href="/controll/activity/edit?key={{activity.key}}">{{activity.name ? activity.name : "[חסר שם]"}}</a></td>
         <td>
           {{activity.submitted_by_user.name}}<br />
           {{activity.submitted_by_user.email}}<br />
@@ -60,7 +60,8 @@
       <div class="fancybox-outer">
         <div class="fancybox-inner" style="overflow: auto; width: 500px; height: auto;">
           <div style="width: 500px; display: block;">
-            {{box_content}}
+            <!-- This must NOT have spaces around it, because it behaves like a pre -->
+            <div class="teaser">{{box_content}}</div>
             <p>
               <button ng-click="hideBox()">סגור</button>
             </p>

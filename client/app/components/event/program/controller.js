@@ -25,11 +25,11 @@ module.controller(
   $scope.update();
 
   $scope.register = function(event_index, user_index) {
-    var event_id = $scope.events[event_index].id;
-    var data = {'event': event_id};
+    var event_key = $scope.events[event_index].key;
+    var data = {'event': event_key};
     if (user_index != null) {
-      var user_id = $scope.events[event_index].participants[user_index].id;
-      data['user'] = user_id;
+      var user_key = $scope.events[event_index].participants[user_index].key;
+      data['user'] = user_key;
     }
     ApiClient.post('/event/register', data, function(response) {
       $scope.setStatus('נרשמת לאירוע');

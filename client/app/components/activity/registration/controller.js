@@ -44,7 +44,7 @@ module.controller(
         activity_type: $scope.activity_type,
         maximum_age: parseInt(age_restriction[1]),
         tags: ActivityService.tagsList($scope.tags),
-        submitted_by_user: response.data.user.id
+        submitted_by_user: response.data.user.key
       }
 
       $log.log(activity);

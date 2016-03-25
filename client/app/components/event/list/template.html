@@ -17,7 +17,7 @@
     <tbody>
       <tr ng-repeat="event in events">
         <td>{{$index + 1}}</td>
-        <td><a href="/controll/activity/edit?id={{event.activity.id}}">{{event.activity.name}}</a></td>
+        <td><a href="/controll/activity/edit?key={{event.activity.key}}">{{event.activity.name}}</a></td>
         <td>{{event.activity.activity_type | activity_type}}</td>
         <td>{{event.start_time | date:'dd/MM HH:mm'}}</td>
         <td>{{event.start_time + event.activity.duration_minutes * 60 * 1000 | date:'dd/MM HH:mm'}}</td>
@@ -75,7 +75,8 @@
       <div class="fancybox-outer">
         <div class="fancybox-inner" style="overflow: auto; width: 500px; height: auto;">
           <div style="width: 500px; display: block;">
-            {{box_content}}
+            <!-- This must NOT have spaces around it, because it behaves like a pre -->
+            <div class="teaser">{{box_content}}</div>
             <p>
               <button ng-click="hideBox()" ng-show="show_close_box">סגור</button>
               <button ng-click="box_action()" ng-show="show_ok">כן</button>
