@@ -12,7 +12,7 @@ var configFunc = function($routeProvider) {
     var result =
         COMPONENTS_HOME +
         component + '/' + action + '/' +
-        'template' + (MINIFIED ? '.mini' : '') + '.html';
+        'template' + (MINIFIED ? '.min' : '') + '.html';
     return result;
   };
 
