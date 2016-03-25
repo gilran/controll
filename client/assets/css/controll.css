@@ -151,3 +151,24 @@
   width: 500px;
   display: block;
 }
+
+.controll-header-masthead {
+  background-color: #292927;
+}
+
+.controll-header-bg {
+  background-image: url();
+}
+
+.controll-header-navigation {
+  background-color: #000000 !important;
+}
+
+.controll-site-content {
+  background-color: #292927; color:#ffffff;
+}
+
+.controll-site-footer {
+  background-color:#000000;
+  color:#767676;
+}
