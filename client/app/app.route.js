@@ -1,11 +1,10 @@
 'use strict';
 
-var module = angular.module(
-    'bigorApp.Route', ['ngRoute'], function($locationProvider) {
-      $locationProvider.html5Mode(true);
-    });
+var moduleFunc = function($locationProvider) {
+  $locationProvider.html5Mode(true);
+};
 
-module.config(['$routeProvider', function($routeProvider) {
+var configFunc = function($routeProvider) {
   var COMPONENTS_HOME = '/controll/app/components/';
   var MINIFIED = false;
   var makeTemplateUrl = function(component, action) {
@@ -17,33 +16,52 @@ module.config(['$routeProvider', function($routeProvider) {
   };
 
   $routeProvider
-      .when('/controll/user/registration', {
-        templateUrl: makeTemplateUrl('user', 'registration')
-      })
-      .when('/controll/activity/registration', {
-        templateUrl: makeTemplateUrl('activity', 'registration')
-      })
-      .when('/controll/activity/list', {
-        templateUrl: makeTemplateUrl('activity', 'list')
-      })
-      .when('/controll/activity/edit', {
-        templateUrl: makeTemplateUrl('activity', 'edit')
-      })
-      .when('/controll/event/add', {
-        templateUrl: makeTemplateUrl('event', 'add')
-      })
-      .when('/controll/event/list', {
-        templateUrl: makeTemplateUrl('event', 'list')
-      })
-      .when('/controll/import', {
-        templateUrl: COMPONENTS_HOME + 'import/template.html'
-      })
-      .when('/controll/', {
-        templateUrl: makeTemplateUrl('event', 'program')
-      })
-      .otherwise({
-        redirectTo: '/controll/'
-      });
-}]);
+  .when('/controll/user/registration', {
+    templateUrl: makeTemplateUrl('user', 'registration'),
+    controller: 'UserRegistrationCtrl'
+  })
+  .when('/controll/activity/registration', {
+    templateUrl: makeTemplateUrl('activity', 'registration'),
+    controller: 'ActivityRegistrationCtrl'
+  })
+  .when('/controll/activity/list', {
+    templateUrl: makeTemplateUrl('activity', 'list'),
+    controller: 'ActivityListCtrl'
+  })
+  .when('/controll/activity/edit', {
+    templateUrl: makeTemplateUrl('activity', 'edit'),
+    controller: 'ActivityEditCtrl'
+  })
+  .when('/controll/event/list', {
+    templateUrl: makeTemplateUrl('event', 'list'),
+    controller: 'EventListCtrl'
+  })
+  .when('/controll/import', {
+    templateUrl: COMPONENTS_HOME + 'import/template.html',
+    controller: 'ImportCtrl'
+  })
+  .when('/controll/', {
+    templateUrl: makeTemplateUrl('event', 'program'),
+    controller: 'EventProgramCtrl'
+  })
+  .otherwise({
+    redirectTo: '/controll/'
+  });
+};
 
+var CONTROLLER_MODULES = [
+  'bigorApp.ActivityEdit',
+  'bigorApp.ActivityList',
+  'bigorApp.ActivityRegistration',
+  'bigorApp.EventList',
+  'bigorApp.EventProgram',
+  'bigorApp.Import',
+  'bigorApp.UserRegistration'
+];
 
+angular
+.module(
+    'bigorApp.Route',
+    ['ngRoute'].concat(CONTROLLER_MODULES),
+    ['$locationProvider', moduleFunc])
+.config(['$routeProvider', configFunc]);

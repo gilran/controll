@@ -1,17 +1,9 @@
 'use strict';
 
-var module = angular.module('bigorApp.ActivityEdit', [
-  'bigorApp.ActivityService'
-]);
-
-module.controller(
-    'ActivityEditCtrl',
-    function($scope, $location, $log, $routeParams, ApiClient,
-             ActivityService) {
-  $log.log('ActivityEditCtrl');
+var controllerFunc = function(
+    $scope, $location, $routeParams, ApiClient, ActivityService) {
 
   $scope.submit = function() {
-    $log.log('submit');
     var age_restriction = $scope.age_restriction.split(',');
     var activity = $scope.activity;
     delete activity.__proto__;
@@ -34,7 +26,6 @@ module.controller(
 
     activity.unavailable_times =
         ActivityService.unavailableTimesList($scope.unavailable_times);
-    $log.log(activity);
 
     ApiClient.update('activity', activity, function() {
       $scope.setStatus('Activity information saved');
@@ -45,7 +36,6 @@ module.controller(
       ApiClient.getUser($location.path()),
       ApiClient.fetch('activity', $routeParams['key'], false /* recursive */)
   ]).then(function(responses) {
-    $log.log(responses);
     $scope.user = responses[0].data.user;
     $scope.activity = responses[1].data;
 
@@ -74,4 +64,13 @@ module.controller(
       $scope.unavailable_times[item_index] = true;
     }
   });
-});
+}
+
+angular
+.module(
+    'bigorApp.ActivityEdit',
+    ['bigorApp.ActivityService', 'bigorApp.ApiClient'])
+.controller(
+    'ActivityEditCtrl',
+    ['$scope', '$location', '$routeParams', 'ApiClient', 'ActivityService',
+     controllerFunc]);

@@ -1,8 +1,6 @@
-var module = angular.module('bigorApp.EventService', [
-  'bigorApp.ApiClient'
-]);
+'use strict';
 
-module.service('EventService', function($log, $rootScope, ApiClient) {
+var serviceFunc = function($rootScope, ApiClient) {
   this.addEvent = function(activity, day, start_time) {
     var day = parseInt(day);
     if (day != 24 && day != 25) {
@@ -24,9 +22,12 @@ module.service('EventService', function($log, $rootScope, ApiClient) {
       'crew': [],
       'participants': []
     };
-    $log.log('Event:' + JSON.stringify(event));
     ApiClient.insert('event', event, function(response) {
       $rootScope.setStatus('Event created');
     });
   };
-});
+}
+
+angular
+.module('bigorApp.EventService', ['bigorApp.ApiClient'])
+.service('EventService', ['$rootScope', 'ApiClient', serviceFunc]);

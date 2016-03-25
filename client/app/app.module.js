@@ -1,31 +1,15 @@
-'use strict'
+'use strict';
 
-var app = angular.module('bigorApp', [
-  'bigorApp.ActivityEdit',
-  'bigorApp.ActivityList',
-  'bigorApp.ActivityService',
-  'bigorApp.ActivityRegistration',
-  'bigorApp.ApiClient',
-  'bigorApp.EventAdd',
-  'bigorApp.EventList',
-  'bigorApp.EventProgram',
-  'bigorApp.Import',
-  'bigorApp.Route',
-  'bigorApp.UserRegistration'
-]);
-
-app.controller(
-    'MainCtrl',
-    function($log, $scope, $rootScope, $window, $location, $timeout,
-             ApiClient) {
+var controllerFunc = function(
+    $scope, $rootScope, $window, $location, $timeout, ApiClient) {
   $scope.clearStatus = function() {
-    // TODO(gilran): Condifer ng-show.
+    // TODO(gilran): Consider ng-show.
     $scope.status = '';
     $scope.status_class = 'invisible';
   };
 
   var internalSetStatus = function(status_class, message, show_for_ms) {
-    // TODO(gilran): Condifer ng-show.
+    // TODO(gilran): Consider ng-show.
     $scope.status_class = status_class;
     $scope.status = message;
     var last_status_update = Date.now();
@@ -77,6 +61,12 @@ app.controller(
       $scope.logged_in = false;
     }
   });
+};
 
-  $scope.clearStatus();
-});
+angular
+.module(
+    'bigorApp', ['bigorApp.ApiClient', 'bigorApp.Filters', 'bigorApp.Route'])
+.controller(
+    'MainCtrl',
+    ['$scope', '$rootScope', '$window', '$location', '$timeout', 'ApiClient',
+     controllerFunc]);

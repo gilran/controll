@@ -1,13 +1,6 @@
 'use strict';
 
-var module = angular.module('bigorApp.EventList', [
-  'bigorApp.Filters'
-]);
-
-module.controller(
-    'EventListCtrl', function($scope, $location, $window, $log, ApiClient) {
-  $log.log('EventListCtrl');
-
+var controllerFunc = function($scope, $location, $window, ApiClient) {
   $scope.show_box = false;
   $scope.box_content = '';
 
@@ -50,7 +43,6 @@ module.controller(
       $window.location.href = response.data.url;
       return;
     }
-    $log.log(response.data.user);
     if (!response.data.user.credentials_level ||
         response.data.user.credentials_level < 2) {
       $scope.setError('Unauthorized');
@@ -114,7 +106,6 @@ module.controller(
   };
 
   $scope.removeFromCrew = function(event_index, user_index) {
-    $log.log(event_index);
     var event_key = $scope.events[event_index].key;
     var user_key = $scope.events[event_index].crew[user_index].key;
     var data = {'event': event_key, 'user': user_key};
@@ -145,6 +136,12 @@ module.controller(
       $scope.events[event_index].participants.push(user);
     });
   };
-});
+};
+
+angular
+.module('bigorApp.EventList', ['bigorApp.ApiClient'])
+.controller(
+    'EventListCtrl',
+    ['$scope', '$location', '$window', 'ApiClient', controllerFunc]);
 
 

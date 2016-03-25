@@ -1,20 +1,11 @@
 'use strict';
 
-var module = angular.module('bigorApp.ActivityList', [
-  'bigorApp.Filters',
-  'bigorApp.EventService'
-]);
-
-module.controller(
-    'ActivityListCtrl',
-    function($scope, $location, $window, $log, ApiClient, EventService) {
-  $log.log('ActivityListCtrl');
-  
+var controllerFunc = function(
+    $scope, $location, $window, ApiClient, EventService) {
   $scope.show_box = false;
   $scope.box_content = '';
-  
+
   $scope.showBox = function(content) {
-    $log.log('showBox');
     $scope.box_content = content;
     $scope.show_box = true;
   };
@@ -29,7 +20,6 @@ module.controller(
       $window.location.href = response.data.url;
       return;
     }
-    $log.log(response.data.user);
     if (!response.data.user.credentials_level ||
         response.data.user.credentials_level < 2) {
       $scope.setError('Unauthorized');
@@ -50,7 +40,6 @@ module.controller(
     };
 
     ApiClient.query('activity', true /* recursive */, function(response) {
-      $log.log(response.data);
       for (var i = 0; i < response.data.length; i++) {
         $scope.event_day.push('24');
         $scope.event_start_time.push('10:00');
@@ -59,5 +48,13 @@ module.controller(
       $scope.activities = response.data;
     });
   });
-});
+}
+
+angular
+.module(
+    'bigorApp.ActivityList', ['bigorApp.ApiClient', 'bigorApp.EventService'])
+.controller(
+    'ActivityListCtrl',
+    ['$scope', '$location', '$window', 'ApiClient', 'EventService',
+     controllerFunc]);
 

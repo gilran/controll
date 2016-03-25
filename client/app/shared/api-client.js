@@ -1,9 +1,6 @@
 'use strict'
 
-var module = angular.module('bigorApp.ApiClient', []);
-
-module.service(
-    'ApiClient', function($http, $q, $httpParamSerializer, $rootScope) {
+var serviceFunc = function($http, $q, $httpParamSerializer, $rootScope) {
   this.get = function(path, params, callback) {
     var url = '/api' + path + '?' + $httpParamSerializer(params);
     var request = {
@@ -81,9 +78,9 @@ module.service(
 
     return all_done.promise;
   }
-});
+};
 
-module.factory('HttpInterceptor', function($q, $log, $rootScope) {
+var interceptorFunc = function($q, $log, $rootScope) {
   return {
     'request': function(config) {
       $rootScope.setMessage('טוען...');
@@ -98,12 +95,19 @@ module.factory('HttpInterceptor', function($q, $log, $rootScope) {
     },
     'responseError': function(rejection) {
       $rootScope.setError(rejection.data.error_message);
-      $log.log(rejection);
       return $q.reject(rejection);
     }
   };
-});
+};
 
-module.config(function($httpProvider) {
+var configFunc = function($httpProvider) {
   $httpProvider.interceptors.push('HttpInterceptor');
-});
+};
+
+angular
+.module('bigorApp.ApiClient', [])
+.service(
+    'ApiClient',
+    ['$http', '$q', '$httpParamSerializer', '$rootScope', serviceFunc])
+.factory('HttpInterceptor', ['$q', '$log', '$rootScope', interceptorFunc])
+.config(['$httpProvider', configFunc]);

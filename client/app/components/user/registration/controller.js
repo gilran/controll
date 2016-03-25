@@ -1,12 +1,6 @@
 'use strict';
 
-var module = angular.module('bigorApp.UserRegistration', []);
-
-module.controller(
-    'UserRegistrationCtrl',
-    function ($scope, $log, $location, $window, $route, ApiClient) {
-  $log.log('UserRegistrationCtrl');
-
+var controllerFunc = function ($scope, $location, $window, ApiClient) {
   $scope.getYearsList = function() {
     var result = [];
     for (var i = 2016; i >= 1900; --i) {
@@ -27,10 +21,8 @@ module.controller(
       'is_club_member': $scope.is_club_member
     };
 
-    $log.log('request content:' + JSON.stringify(request_content));
-
     ApiClient.update('user', request_content, function() {
-      $scope.setStatus('User information updated successfully');
+      $scope.setStatus('המידע נשמר בהצלחה');
     });
   };
   
@@ -72,25 +64,10 @@ module.controller(
     }
     $scope.events = responses[1].data;
   });
-});
+}
 
-module.filter('user_role', function() {
-  return function(event_and_user) {
-    var event = event_and_user[0];
-    var user = event_and_user[1];
-    // TODO(gilran): Proper participants and crew members names.
-    if (event.participants.indexOf(user.key) != -1) {
-      return 'שחקן/ית';
-    }
-    for (var i = 0; i < event.crew.length; i++) {
-      if (event.crew[i].key == user.key) {
-        return 'מנחה';
-      }
-    }
-    throw 'Got an event that the user is not in:' +
-        '\nuser.key = ' + user.key +
-        '\nparticipants = ' + JSON.stringify(event.participants) +
-        '\ncrew = ' + JSON.stringify(event.crew);
-  };
-});
-
+angular
+.module('bigorApp.UserRegistration', ['bigorApp.ApiClient'])
+.controller(
+    'UserRegistrationCtrl',
+    ['$scope', '$location', '$window', 'ApiClient', controllerFunc]);

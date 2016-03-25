@@ -1,15 +1,6 @@
 'use strict';
 
-var module = angular.module('bigorApp.EventProgram', [
-  'bigorApp.Filters',
-  'bigorApp.ActivityService'
-]);
-
-module.controller(
-    'EventProgramCtrl',
-    function($scope, $location, $window, $log, ApiClient, ActivityService) {
-  $log.log('EventProgramCtrl');
-
+var controllerFunc = function($scope, ApiClient, ActivityService) {
   $scope.update = function() {
     ApiClient.get('/event/program', {}, function(response) {
       $scope.events = response.data;
@@ -102,7 +93,6 @@ module.controller(
         event.start_time + event.activity.duration_minutes * 60 * 1000);
     var end_minutes_in_day =
         end_as_date.getHours() * 60 + end_as_date.getMinutes();
-    $log.log(end_minutes_in_day);
     return (end_minutes_in_day < requested_end_time);
   };
 
@@ -132,7 +122,15 @@ module.controller(
       return result;
     };
   };
-});
+};
+
+angular
+.module(
+    'bigorApp.EventProgram',
+    ['bigorApp.ActivityService', 'bigorApp.ApiClient', 'bigorApp.Filters'])
+.controller(
+    'EventProgramCtrl',
+    ['$scope', 'ApiClient', 'ActivityService', controllerFunc]);
 
 
 

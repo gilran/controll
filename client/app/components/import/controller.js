@@ -1,13 +1,6 @@
 'use strict';
 
-var module = angular.module('bigorApp.Import', [
-  'bigorApp.Filters'
-]);
-
-module.controller(
-    'ImportCtrl', function($scope, $location, $window, $log, ApiClient) {
-  $log.log('ImportCtrl');
-  
+controllerFunc = function($scope, $location, $window, ApiClient) {
   ApiClient.getUser($location.path(), function(response) {
     if (!response.data.email) {
       $window.location.href = response.data.url;
@@ -29,5 +22,11 @@ module.controller(
       $scope.setStatus('יבוא הנתונים הצליח');
     });
   };
-});
+};
+
+angular
+.module('bigorApp.Import', ['bigorApp.ApiClient'])
+.controller(
+    'ImportCtrl',
+    ['$scope', '$location', '$window', 'ApiClient', controllerFunc]);
 

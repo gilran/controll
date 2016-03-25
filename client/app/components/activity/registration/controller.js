@@ -1,13 +1,7 @@
 'use strict';
 
-var module = angular.module('bigorApp.ActivityRegistration', [
-  'bigorApp.ActivityService'
-]);
-
-module.controller(
-    'ActivityRegistrationCtrl',
-    function($scope, $location, $window, $log, ApiClient, ActivityService) {
-  $log.log('ActivityRegistrationCtrl');
+var controllerFunc = function(
+    $scope, $location, $window, ApiClient, ActivityService) {
   ApiClient.getUser($location.path(), function(response) {
     if (!response.data.email) {
       $window.location.href = response.data.url;
@@ -47,11 +41,18 @@ module.controller(
         submitted_by_user: response.data.user.key
       }
 
-      $log.log(activity);
-
       ApiClient.insert('activity', activity, function() {
         $scope.setStatus('Activity information saved');
       });
     };
   });
-});
+}
+
+angular
+.module(
+    'bigorApp.ActivityRegistration',
+    ['bigorApp.ActivityService', 'bigorApp.ApiClient'])
+.controller(
+    'ActivityRegistrationCtrl',
+    ['$scope', '$location', '$window', 'ApiClient', 'ActivityService',
+     controllerFunc]);

@@ -1,6 +1,6 @@
-var module = angular.module('bigorApp.ActivityService', []);
+'use strict';
 
-module.service('ActivityService', function() {
+var serviceFunc = function() {
   // TODO(gilran): This is for bigor 2016 only.
   this.unavailableTimeName = function(i) {
     var DAYS = ['sunday', 'monday'];
@@ -54,5 +54,9 @@ module.service('ActivityService', function() {
     'workshop': 'סדנה',
     'other': 'אחר'
   };
-});
+};
+
+angular
+.module('bigorApp.ActivityService', [])
+.service('ActivityService', [serviceFunc]);
 
