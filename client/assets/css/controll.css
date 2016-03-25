@@ -114,3 +114,40 @@
 .teaser {
   white-space: pre-wrap;
 }
+
+.controll-center {
+  text-align: center;
+}
+
+.contoll-fancybox-l1 {
+  width: auto;
+  height: auto;
+  display: block;
+}
+
+.contoll-fancybox-l2 {
+  width: 530px;
+  height: auto;
+  position: absolute;
+  top: 109px;
+  left: 687px;
+  opacity: 1;
+  overflow: visible;
+}
+
+.contoll-fancybox-l3 {
+  padding: 15px;
+  width: auto;
+  height: auto;
+}
+
+.contoll-fancybox-l5 {
+  overflow: auto;
+  width: 500px;
+  height: auto;
+}
+
+.contoll-fancybox-l6 {
+  width: 500px;
+  display: block;
+}
