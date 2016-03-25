@@ -1,12 +1,13 @@
 'use strict';
 
+var MINIFIED = false;
+
 var moduleFunc = function($locationProvider) {
   $locationProvider.html5Mode(true);
 };
 
 var configFunc = function($routeProvider) {
   var COMPONENTS_HOME = '/controll/app/components/';
-  var MINIFIED = false;
   var makeTemplateUrl = function(component, action) {
     var result =
         COMPONENTS_HOME +
